@@ -7,7 +7,36 @@
 <body>
     <h1>Hello!</h1>
     <p>Test</p>
-    <input type="checkbox" id="item_a" name="item_a" value="Coke">
+    <input type="checkbox" id="item_a" name="item_a" value="Coke" onchange="updateTextbox()">
     <label for="item_a"> Coke</label>
+    <input type="checkbox" id="item_b" name="item_b" value="Diet Coke" onchange="updateTextbox()">
+    <label for="item_b"> Diet Coke</label>
+
+    <h3>Textbox</h3>
+
+    <textarea id="textbox" rows="10" cols="30" readonly></textarea>
+
+    <button onclick="copyToClipboard()">Copy to Clipboard</button>
+
+    <script>
+    function updateTextbox() {
+        var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        var textbox = document.getElementById('textbox');
+        var result = "";
+
+        checkboxes.forEach(function(cb) {
+            if (cb.checked) {
+                result += cb.value + "\n";
+            }
+        });
+
+        textbox.value = result;
+    }
+
+    function copyToClipboard() {
+        var textbox = document.getElementById('textbox');
+        navigator.clipboard.writeText(textbox.value);
+    }
+    </script>
 </body>
 </html>
