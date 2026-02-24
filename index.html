@@ -2,11 +2,279 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Demo Stock Checking</title>
 </head>
 <body>
-    <h1>Hello!</h1>
+    <h1>Welcome!</h1>
     <p>Test</p>
-    <input type="checkbox" id="item_a" name="item_a" value="Coke">
+    
+    <h1>Input Previous Summary</h1>
+    <textarea id="inputtextbox" rows="10" cols="30"></textarea><br><br>
+    <button onclick="applyInput()">Apply</button>
+
+    <h1>Items</h1>
+    <h3>Front</h3>
+    <label><input type="checkbox" value="Water" onchange="updateTextbox()"> Water</label><br>
+    <label><input type="checkbox" value="Coke" onchange="updateTextbox()"> Coke</label><br>
+    <label><input type="checkbox" value="Diet Coke" onchange="updateTextbox()"> Diet Coke</label><br>
+    <label><input type="checkbox" value="Coke Zero" onchange="updateTextbox()"> Coke Zero</label><br>
+    <label><input type="checkbox" value="Coconut" onchange="updateTextbox()"> Coconut</label><br>
+    <label><input type="checkbox" value="Aloe" onchange="updateTextbox()"> Aloe</label><br>
+    <label><input type="checkbox" value="Pulp" onchange="updateTextbox()"> Pulp</label><br>
+    <label><input type="checkbox" value="กล่อง 1 หลุม" onchange="updateTextbox()"> กล่อง 1 หลุม</label>
+    <button onclick="changeCount('กล่อง 1 หลุม', -1)">-</button>
+    <span id="count-กล่อง 1 หลุม">1</span>
+    <button onclick="changeCount('กล่อง 1 หลุม', 1)">+</button><br>
+    <label><input type="checkbox" value="กล่อง 2 หลุม" onchange="updateTextbox()"> กล่อง 2 หลุม</label>
+    <button onclick="changeCount('กล่อง 2 หลุม', -1)">-</button>
+    <span id="count-กล่อง 2 หลุม">1</span>
+    <button onclick="changeCount('กล่อง 2 หลุม', 1)">+</button><br>
+    <label><input type="checkbox" value="กล่อง 500 ml" onchange="updateTextbox()"> กล่อง 500 ml</label><br>
+    <label><input type="checkbox" value="กล่อง 650 ml" onchange="updateTextbox()"> กล่อง 650 ml</label><br>
+    <label><input type="checkbox" value="Noodle Box" onchange="updateTextbox()"> Noodle Box</label><br>
+    <label><input type="checkbox" value="Sauce Cup" onchange="updateTextbox()"> Sauce Cup</label><br>
+    <label><input type="checkbox" value="กล่อง Foil" onchange="updateTextbox()"> กล่อง Foil</label><br>
+    <label><input type="checkbox" value="Foil Lid" onchange="updateTextbox()"> Foil Lid</label><br>
+    <label><input type="checkbox" value="Starter Box" onchange="updateTextbox()"> Starter Box</label><br>
+    <label><input type="checkbox" value="Chopsticks" onchange="updateTextbox()"> Chopsticks</label><br>
+    <label><input type="checkbox" value="Bubble Tea Straw" onchange="updateTextbox()"> Bubble Tea Straw</label><br>
+    <label><input type="checkbox" value="Spoon" onchange="updateTextbox()"> Spoon</label>
+    <button onclick="changeCount('Spoon', -1)">-</button>
+    <span id="count-Spoon">1</span>
+    <button onclick="changeCount('Spoon', 1)">+</button><br>
+    <label><input type="checkbox" value="Fork" onchange="updateTextbox()"> Fork</label>
+    <button onclick="changeCount('Fork', -1)">-</button>
+    <span id="count-Fork">1</span>
+    <button onclick="changeCount('Fork', 1)">+</button><br>
+    <label><input type="checkbox" value="Blue Rolls" onchange="updateTextbox()"> Blue Rolls</label><br>
+    <label><input type="checkbox" value="Napkins" onchange="updateTextbox()"> Napkins</label><br>
+    <label><input type="checkbox" value="Till Rolls" onchange="updateTextbox()"> Till Rolls</label><br>
+    <label><input type="checkbox" value="Rolls (Small)" onchange="updateTextbox()"> Rolls (Small)</label><br>
+    <label><input type="checkbox" value="Kitchen Glove" onchange="updateTextbox()"> Kitchen Glove</label><br>
+    <label><input type="checkbox" value="Garbage Bags" onchange="updateTextbox()"> Garbage Bags</label><br>
+    <label><input type="checkbox" value="S1 bags" onchange="updateTextbox()"> S1 bags</label><br>
+    <label><input type="checkbox" value="S2 bags" onchange="updateTextbox()"> S2 bags</label><br>
+    <label><input type="checkbox" value="S3 bags" onchange="updateTextbox()"> S3 bags</label><br>
+    <label><input type="checkbox" value="S4 bags" onchange="updateTextbox()"> S4 bags</label><br>
+    <label><input type="checkbox" value="Cling Film" onchange="updateTextbox()"> Cling Film</label><br>
+    <label><input type="checkbox" value="Ziplock Bag" onchange="updateTextbox()"> Ziplock Bag</label><br>
+    <label><input type="checkbox" value="Regular Bubble Tea Cup" onchange="updateTextbox()"> Regular Bubble Tea Cup</label><br>
+    <label><input type="checkbox" value="Large Bubble Tea Cup" onchange="updateTextbox()"> Large Bubble Tea Cup</label><br>
+    <label><input type="checkbox" value="Hand Sanitizer" onchange="updateTextbox()"> Hand Sanitizer</label><br>
+    <label><input type="checkbox" value="Dishwashing Liquid" onchange="updateTextbox()"> Dishwashing Liquid</label><br>
+    <label><input type="checkbox" value="Floor Cleaning Liquid" onchange="updateTextbox()"> Floor Cleaning Liquid</label><br>
+    <label><input type="checkbox" value="Carnation" onchange="updateTextbox()"> Carnation</label><br>
+    <label><input type="checkbox" value="Coconut Smoothies" onchange="updateTextbox()"> Coconut Smoothies</label><br>
+    <label><input type="checkbox" value="Mango Smoothies" onchange="updateTextbox()"> Mango Smoothies</label><br>
+    <label><input type="checkbox" value="Green Tea" onchange="updateTextbox()"> Green Tea</label><br>
+    <label><input type="checkbox" value="Cofe Coffee" onchange="updateTextbox()"> Cofe Coffee</label><br>
+    <label><input type="checkbox" value="Mango" onchange="updateTextbox()"> Mango</label><br>
+
+    <h3>Vegetables</h3>
+    <label><input type="checkbox" value="Chili" onchange="updateTextbox()"> Chlli</label><br>
+    <label><input type="checkbox" value="Garlic" onchange="updateTextbox()"> Garlic</label><br>
+    <label><input type="checkbox" value="White Cabbage" onchange="updateTextbox()"> White Cabbage</label><br>
+    <label><input type="checkbox" value="Heart Cabbage" onchange="updateTextbox()"> Heart Cabbage</label><br>
+    <label><input type="checkbox" value="Broccoli" onchange="updateTextbox()"> Broccoli</label><br>
+    <label><input type="checkbox" value="Cucumber" onchange="updateTextbox()"> Cucumber</label><br>
+    <label><input type="checkbox" value="Green Beans" onchange="updateTextbox()"> Green Beans</label><br>
+    <label><input type="checkbox" value="Spring Onion" onchange="updateTextbox()"> Spring Onion</label><br>
+    <label><input type="checkbox" value="Basil" onchange="updateTextbox()"> Basil</label><br>
+    <label><input type="checkbox" value="Holy Basil" onchange="updateTextbox()"> Holy Basil</label><br>
+    <label><input type="checkbox" value="Papaya" onchange="updateTextbox()"> Papaya</label><br>
+    <label><input type="checkbox" value="Beansprout" onchange="updateTextbox()"> Beansprout</label><br>
+    <label><input type="checkbox" value="Onion" onchange="updateTextbox()"> Onion</label><br>
+    <label><input type="checkbox" value="Red Onion" onchange="updateTextbox()"> Red Onion</label><br>
+    <label><input type="checkbox" value="Carrot" onchange="updateTextbox()"> Carrot</label><br>
+    <label><input type="checkbox" value="Galangal (Kha)" onchange="updateTextbox()"> Galangal (Kha)</label><br>
+    <label><input type="checkbox" value="Lemongrass (Ta Krai)" onchange="updateTextbox()"> Lemongrass (Ta Krai)</label><br>
+    <label><input type="checkbox" value="Pineapple" onchange="updateTextbox()"> Pineapple</label><br>
+    <label><input type="checkbox" value="Tofu" onchange="updateTextbox()"> Tofu</label>
+    <button onclick="changeCount('Tofu', -1)">-</button>
+    <span id="count-Tofu">1</span>
+    <button onclick="changeCount('Tofu', 1)">+</button><br>
+
+    <h3>Kitchen</h3>
+    <label><input type="checkbox" value="Coconut" onchange="updateTextbox()"> Coconut</label><br>
+    <label><input type="checkbox" value="Bamboo Shoot" onchange="updateTextbox()"> Bamboo Shoot</label><br>
+    <label><input type="checkbox" value="Oyster Sauce" onchange="updateTextbox()"> Oyster Sauce</label><br>
+    <label><input type="checkbox" value="Oyster Panda" onchange="updateTextbox()"> Oyster Panda</label><br>
+    <label><input type="checkbox" value="Oyster Gluten Free" onchange="updateTextbox()"> Oyster Gluten Free</label><br>
+    <label><input type="checkbox" value="Si Aew Gluten Free" onchange="updateTextbox()"> Si Aew Gluten Free</label><br>
+    <label><input type="checkbox" value="Oil" onchange="updateTextbox()"> Oil</label><br>
+    <label><input type="checkbox" value="Rice" onchange="updateTextbox()"> Rice</label><br>
+    <label><input type="checkbox" value="Sticky Rice" onchange="updateTextbox()"> Sticky Rice</label><br>
+    <label><input type="checkbox" value="Thin Soy Sauce" onchange="updateTextbox()"> Thin Soy Sauce</label><br>
+    <label><input type="checkbox" value="Dark Soy Sauce" onchange="updateTextbox()"> Dark Soy Sauce</label><br>
+    <label><input type="checkbox" value="Fish Sauce" onchange="updateTextbox()"> Fish Sauce</label><br>
+    <label><input type="checkbox" value="ซอสฝาเขียว" onchange="updateTextbox()"> ซอสฝาเขียว</label><br>
+    <label><input type="checkbox" value="น้ำส้มสายชู" onchange="updateTextbox()"> น้ำส้มสายชู</label><br>
+    <label><input type="checkbox" value="Egg" onchange="updateTextbox()"> Egg</label><br>
+    <label><input type="checkbox" value="Peanut" onchange="updateTextbox()"> Peanut</label><br>
+    <label><input type="checkbox" value="Salt" onchange="updateTextbox()"> Salt</label><br>
+    <label><input type="checkbox" value="พริกไทย" onchange="updateTextbox()"> พริกไทย</label><br>
+    <label><input type="checkbox" value="รสดี" onchange="updateTextbox()"> รสดี</label><br>
+    <label><input type="checkbox" value="คนอร์" onchange="updateTextbox()"> คนอร์</label><br>
+    <label><input type="checkbox" value="Rice Noodle 1mm" onchange="updateTextbox()"> Rice Noodle 1mm</label><br>
+    <label><input type="checkbox" value="Rice Noodle 3mm" onchange="updateTextbox()"> Rice Noodle 3mm</label><br>
+    <label><input type="checkbox" value="Rice Noodle 5mm" onchange="updateTextbox()"> Rice Noodle 5mm</label><br>
+    <label><input type="checkbox" value="Egg Noodle" onchange="updateTextbox()"> Egg Noodle</label><br>
+    <label><input type="checkbox" value="Sesame Oil" onchange="updateTextbox()"> Sesame Oil</label><br>
+    <label><input type="checkbox" value="Fish Ball" onchange="updateTextbox()"> Fish Ball</label><br>
+    <label><input type="checkbox" value="Tomato Sauce" onchange="updateTextbox()"> Tomato Sauce</label><br>
+    <label><input type="checkbox" value="Chili Paste (Nam Prik Pow)" onchange="updateTextbox()"> Chili Paste (Nam Prik Pow)</label><br>
+    <label><input type="checkbox" value="Chili Flakes" onchange="updateTextbox()"> Chili Flakes</label><br>
+    <label><input type="checkbox" value="Tamarind Paste" onchange="updateTextbox()"> Tamarind Paste</label><br>
+    <label><input type="checkbox" value="เกล็ดขนมปัง" onchange="updateTextbox()"> เกล็ดขนมปัง</label><br>
+    <label><input type="checkbox" value="น้ำตาลปี๊บ" onchange="updateTextbox()"> น้ำตาลปี๊บ</label><br>
+    <label><input type="checkbox" value="Corn" onchange="updateTextbox()"> Corn</label><br>
+    <label><input type="checkbox" value="Green Curry Paste" onchange="updateTextbox()"> Green Curry Paste</label><br>
+    <label><input type="checkbox" value="Red Curry Paste" onchange="updateTextbox()"> Red Curry Paste</label><br>
+    <label><input type="checkbox" value="Massaman Curry Paste" onchange="updateTextbox()"> Massaman Curry Paste</label><br>
+    <label><input type="checkbox" value="Panang Curry Paste" onchange="updateTextbox()"> Panang Curry Paste</label><br>
+    <label><input type="checkbox" value="Tom Yum Paste" onchange="updateTextbox()"> Tom Yum Paste</label><br>
+
+    <h3>Meat</h3>
+    <label><input type="checkbox" value="ไก่ตัว" onchange="updateTextbox()"> ไก่ตัว</label>
+    <button onclick="changeCount('ไก่ตัว', -1)">-</button>
+    <span id="count-ไก่ตัว">1</span>
+    <button onclick="changeCount('ไก่ตัว', 1)">+</button><br>
+    <label><input type="checkbox" value="ไก่สด 20 kg" onchange="updateTextbox()"> ไก่สด 20 kg</label><br>
+    <label><input type="checkbox" value="หมูชิ้น" onchange="updateTextbox()"> หมูชิ้น</label>
+    <button onclick="changeCount('หมูชิ้น', -1)">-</button>
+    <span id="count-หมูชิ้น">1</span>
+    <button onclick="changeCount('หมูชิ้น', 1)">+</button><br>
+    <label><input type="checkbox" value="หมูบด" onchange="updateTextbox()"> หมูบด</label>
+    <button onclick="changeCount('หมูบด', -1)">-</button>
+    <span id="count-หมูบด">1</span>
+    <button onclick="changeCount('หมูบด', 1)">+</button><br>
+    <label><input type="checkbox" value="กุ้งสด" onchange="updateTextbox()"> กุ้งสด</label>
+    <button onclick="changeCount('กุ้งสด', -1)">-</button>
+    <span id="count-กุ้งสด">1</span>
+    <button onclick="changeCount('กุ้งสด', 1)">+</button><br>
+    <label><input type="checkbox" value="กุ้งผัด" onchange="updateTextbox()"> กุ้งผัด</label>
+    <button onclick="changeCount('กุ้งผัด', -1)">-</button>
+    <span id="count-กุ้งผัด">1</span>
+    <button onclick="changeCount('กุ้งผัด', 1)">+</button><br>
+
+    <h3>Starters</h3>
+    <label><input type="checkbox" value="Chicken Sauce" onchange="updateTextbox()"> Chicken Sauce</label><br>
+    <label><input type="checkbox" value="Flaming Chicken" onchange="updateTextbox()"> Flaming Chicken</label><br>
+    <label><input type="checkbox" value="Chicken (Khao Yum)" onchange="updateTextbox()"> Chicken (Khao Yum)</label><br>
+    <label><input type="checkbox" value="Chicken (Salt Pepper)" onchange="updateTextbox()"> Chicken (Salt Pepper)</label><br>
+    <label><input type="checkbox" value="Paprika Powder" onchange="updateTextbox()"> Paprika Powder</label><br>
+    <label><input type="checkbox" value="Spring Roll Pastry" onchange="updateTextbox()"> Spring Roll Pastry</label><br>
+    <label><input type="checkbox" value="Pork Dumpling" onchange="updateTextbox()"> Pork Dumpling</label><br>
+    <label><input type="checkbox" value="Wonton Pastry" onchange="updateTextbox()"> Wonton Pastry</label><br>
+    <label><input type="checkbox" value="Prawns (Spring Roll)" onchange="updateTextbox()"> Prawns (Spring Roll)</label><br>
+    <label><input type="checkbox" value="Chips" onchange="updateTextbox()"> Chips</label><br>
+    
+    <h1>Summary</h1>
+    <textarea id="textbox" rows="10" cols="30" readonly></textarea><br><br>
+    <button onclick="copyToClipboard()">Copy to Clipboard</button>
+
+    <script>
+    var counts = {
+        "กล่อง 1 หลุม": 1,
+        "กล่อง 2 หลุม": 1,
+        "Spoon": 1,
+        "Fork": 1,
+        "Tofu": 1,
+        "ไก่ตัว": 1,
+        "หมูชิ้น": 1,
+        "หมูบด": 1,
+        "กุ้งสด": 1,
+        "กุ้งผัด": 1
+    };
+
+    function changeCount(item, delta) {
+
+        counts[item] += delta;
+
+        if (counts[item] < 1) {
+            counts[item] = 1;
+        }
+
+        document.getElementById("count-" + item).textContent = counts[item];
+
+        updateTextbox();
+    }
+
+    function updateTextbox() {
+        var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        var textbox = document.getElementById('textbox');
+        var result = "";
+
+        checkboxes.forEach(function(cb) {
+
+            if (cb.checked) {
+                
+                var count = counts[cb.value];
+
+                if (count > 1){
+                    result += cb.value + " (" + count + ")\n";
+                } else {
+                    result += cb.value + "\n";
+                }
+
+            }
+        });
+
+        textbox.value = result;
+    }
+
+    function applyInput() {
+        var input = document.getElementById("inputtextbox").value;
+        var lines = input.split("\n");
+
+        var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+
+        // reset all first
+        checkboxes.forEach(function(cb){
+            cb.checked = false;
+            counts[cb.value] = 1;
+            
+            var countElement = document.getElementById("count-" + cb.value);
+            if(countElement){
+                countElement.textContent = 1;
+            }
+        });
+
+        lines.forEach(function(line){
+            line = line.trim();
+
+            if(line === "") return;
+
+            var match = line.match(/^(.*?)(?:\s*\((\d+)\))?$/);
+
+            if(match){
+                
+                var item = match[1];
+                var count = match[2] ? parseInt(match[2]) : 1;
+
+                checkboxes.forEach(function(cb){
+
+                    if (cb.value === item){
+
+                        cb.checked = true;
+                        counts[item] = count;
+
+                        var countElement = document.getElementById("count-" + item);
+                        if (countElement) {
+                            countElement.textContent = count;
+                        }
+                    }
+                });
+            }
+        });
+
+        updateTextbox();
+    }
+
+    function copyToClipboard() {
+        var textbox = document.getElementById('textbox');
+        navigator.clipboard.writeText(textbox.value);
+    }
+    </script>
 </body>
 </html>
