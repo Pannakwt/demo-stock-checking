@@ -107,6 +107,20 @@
                     console.error('Error:', error);
                 }
             }
+
+            // load last save data from google sheets
+            async function loadData() {
+                const spreadsheetId = '1vcItq-vwIjsCMrcGKa111moXmEU4usUkS_BjQYTlcgk';
+                const sheetName = 'Form Responses 1';
+                const url = `https://opensheet.elk.sh/${spreadsheetId}/${sheetName}`;
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                const inputTextarea = document.getElementById('Input');
+
+                inputTextarea.value = data[data.length - 1]['Input'];
+            }
             
             // set height of both textboxes in summary area to be max number of input lines among both textboxes
             function changeTextboxHeight() {
@@ -128,6 +142,7 @@
                 })
             }
 
+            // changing checkboxes and quantity based on input textbox
             function selectItems() {
                 // reset all checkboxes and quantity
                 const checkboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -240,12 +255,16 @@
         <div class="summary-area">
             <h1>Input</h1>
             <textarea id="Input" class="textarea-summary" rows="5" cols="40"></textarea><br>
+            <button onclick="loadData()">Load Data</button>
             <button onclick="selectItems()">Select Items</button>
         </div>
         <div class="summary-area">
             <h1>Summary</h1>
-            <textarea readonly id="Summary" class="textarea-summary" rows="5" cols="40"></textarea><br>
-            <button onclick="copyToClipboard()">Copy to Clipboard</button>
+            <form action="https://docs.google.com/forms/d/15eWlwc9vnjh2it3aFVGi07mjn_vSbto3QFM9j0dMC5g/formResponse" method="POST">
+                <textarea readonly name="entry.704604256" id="Summary" class="textarea-summary" rows="5" cols="40"></textarea><br>
+                <button onclick="copyToClipboard()">Copy to Clipboard</button>
+                <button type="submit">Save Data</button>
+            </form>
         </div>
         <div id="items">
             <h1>Items</h1>
