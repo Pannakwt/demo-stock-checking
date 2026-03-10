@@ -1,0 +1,47 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Item</title>
+    <link rel="stylesheet" href="add.css">
+    <script src="add.js"></script>
+</head>
+<body>
+    <h1>Add Item</h1>
+    <a href="index.html">Back</a><br>
+    <form action="https://docs.google.com/forms/d/11jy4lLinqoCPZ6HFNcIBU6wp_4ujURUeBduhj7DYnws/formResponse" method="POST">
+        <section>
+            <label for="name">Item Name</label><br>
+            <input type="text" name="entry.1472301677" id="name" required><br>
+        </section>
+
+        <section>
+            <label for="category">Category</label><br>
+            <select name="category" id="category" onchange="fetchCategoryItems(this)" required>
+                <option value="">Please Select</option>
+                <option value="Front">Front</option>
+                <option value="Vegetables">Vegetables</option>
+                <option value="Kitchen">Kitchen</option>
+                <option value="Meat">Meat</option>
+                <option value="Starters">Starters</option>
+            </select>
+            <input type="hidden" name="entry.1897388242" id="category-hidden" value="">
+        </section>
+
+        <section>
+            <label for="quantity">Quantity</label><br>
+            <input type="number" name="entry.374715622" id="quantity" min="0" max="10" required><br>
+        </section>
+
+        <section>
+            <label for="insert">Insert After</label><br>
+            <select name="insert" id="insert" onchange="updateHiddenInput(this)" required>
+                <option value="">Select Category First</option>
+            </select>
+            <input type="hidden" name="entry.593798105" id="insert-hidden" value="">
+        </section>
+
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
