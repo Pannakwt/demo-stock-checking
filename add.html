@@ -9,7 +9,7 @@
 <body>
     <h1>Add Item</h1>
     <a href="index.html">Back</a><br>
-    <form action="https://docs.google.com/forms/d/11jy4lLinqoCPZ6HFNcIBU6wp_4ujURUeBduhj7DYnws/formResponse" method="POST">
+    <form action="https://docs.google.com/forms/d/11jy4lLinqoCPZ6HFNcIBU6wp_4ujURUeBduhj7DYnws/formResponse" method="POST" target="hidden_iframe" onsubmit="submitted=true;">
         <section>
             <label for="name">Item Name</label><br>
             <input type="text" name="entry.1472301677" id="name" required><br>
@@ -43,5 +43,6 @@
 
         <button type="submit">Submit</button>
     </form>
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display: none;" onload="if(submitted) {window.location='add_success.html';}"></iframe>
 </body>
 </html>
