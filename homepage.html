@@ -1,0 +1,199 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KG Order List</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: "Sarabun", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        div a {
+            display: flex;
+        }
+
+        li {
+            margin-bottom: 3px;
+            align-items: center;
+        }
+        
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .copy-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .indicator {
+            position: absolute;
+            left: 110%;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #f0fff4;
+            color: #15803d;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #c3e6cb;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+
+            /* flexbox to align icon and text */
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tick-icon {
+            width: 16px;
+            height: 16px;
+            color: #16a34a;
+        }
+
+        .indicator.show {
+            opacity: 1;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCurrentList();
+        })
+
+        async function getGoogleSheetData(sheetName) {
+            try {
+                const spreadsheetId = '1vcItq-vwIjsCMrcGKa111moXmEU4usUkS_BjQYTlcgk';
+                const url = `https://opensheet.elk.sh/${spreadsheetId}/${sheetName}`;
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                return data;
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function createItemIdNameMap() {
+            const allItemsData = await getGoogleSheetData('Items');
+
+            let allItemsMap = {};
+
+            allItemsData.forEach(item => {
+                allItemsMap[item['ID']] = item['Item Name']
+            });
+
+            return allItemsMap;
+        }
+
+        async function loadCurrentList() {
+            const allItemsMap = await createItemIdNameMap();
+            const allOrderListsData = await getGoogleSheetData('Order List History');
+
+            const currentListTimestamp = allOrderListsData[allOrderListsData.length - 1]['Timestamp'];
+            const currentListIdQuantity = allOrderListsData[allOrderListsData.length - 1]['Item IDs'];
+            const currentListIdQuantityArray = currentListIdQuantity.split('\n');
+
+            const currentListBodyElement = document.getElementById('current-list-body');
+            
+            let formInputItemNamesValue = '';
+
+            // add each item to list
+            currentListIdQuantityArray.forEach(itemIdQuantity => {
+                let itemInList = document.createElement('li');
+
+                let [itemId, quantity] = itemIdQuantity.split('x')
+                
+                let itemName = allItemsMap[itemId]
+
+                itemInList.textContent = quantity
+                    ? `${itemName} (${quantity})`
+                    : itemName;
+
+                currentListBodyElement.appendChild(itemInList);
+
+                formInputItemNamesValue += itemInList.textContent + '\n';
+            })
+
+            // add last updated time
+            const dateObj = new Date(currentListTimestamp);
+
+            const options = {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+
+            const formattedTimestamp = new Intl.DateTimeFormat('en-GB', options).format(dateObj);
+
+            const lastUpdatedTimestamp = document.getElementById('last-updated-timestamp');
+            lastUpdatedTimestamp.textContent = `Last Updated: ${formattedTimestamp}`;
+
+            // write text to hidden input for copy
+            const formInputItemNames = document.getElementById('item-names');
+            formInputItemNames.value = formInputItemNamesValue.trimEnd();
+        }
+
+        function copy() {
+            const formInputItemNames = document.getElementById('item-names');
+            const indicator = document.getElementById('copy-indicator');
+
+            navigator.clipboard.writeText(formInputItemNames.value);
+
+            indicator.classList.add('show');
+
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000)
+        }
+    </script>
+</head>
+<body>
+    <h1>KG Order List - Home</h1>
+    <div>
+        <a href="homepage.html">Home</a>
+        <a href="mark-delivered-items.html">Mark Delivered Items</a>
+        <a href="edit-current-list.html">Edit Current List</a>
+        <a href="add-new-item.html">Add New Item</a>
+    </div>
+    <div>
+        <h2>Current List</h2>
+        <ul id="current-list-body"></ul>
+    </div>
+    <input type="hidden" id="item-names" value="">
+    <div class="copy-container">
+        <button onclick="copy()">Copy</button>
+        <span id="copy-indicator" class="indicator">
+            <svg
+                class="tick-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+                srroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Copied!
+        </span>
+    </div>
+    <p id="last-updated-timestamp" style="font-style: italic;"></p>
+</body>
+</html>

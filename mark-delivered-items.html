@@ -1,0 +1,155 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KG Order List</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: "Sarabun", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        div a {
+            display: flex;
+        }
+
+        .checkbox {
+            margin-right: 8px;
+            margin-bottom: 6px;
+            zoom: 1.2;
+        }
+
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+    </style>
+    <script>
+        let isSubmitting = false;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCurrentListWithCheckboxes();
+        })
+
+        async function getGoogleSheetData(sheetName) {
+            try {
+                const spreadsheetId = '1vcItq-vwIjsCMrcGKa111moXmEU4usUkS_BjQYTlcgk';
+                const url = `https://opensheet.elk.sh/${spreadsheetId}/${sheetName}`;
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                return data;
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function createItemIdNameMap() {
+            const allItemsData = await getGoogleSheetData('Items');
+
+            let allItemsMap = {};
+
+            allItemsData.forEach(item => {
+                allItemsMap[item['ID']] = item['Item Name']
+            });
+
+            return allItemsMap;
+        }
+
+        async function loadCurrentListWithCheckboxes() {
+            const allItemsMap = await createItemIdNameMap();
+            const allOrderListsData = await getGoogleSheetData('Order List History');
+
+            const currentListIdQuantity = allOrderListsData[allOrderListsData.length - 1]['Item IDs'];
+            const currentListIdQuantityArray = currentListIdQuantity.split('\n');
+
+            currentListIdQuantityArray.forEach(itemIdQuantity => {
+                let [itemId, quantity] = itemIdQuantity.split('x')
+
+                let itemName = allItemsMap[itemId]
+
+                if (quantity) {
+                    itemId = `${itemId}x${quantity}`;
+                    itemName = `${itemName} (${quantity})`;
+                }
+
+                const itemCheckBox = document.createElement('input');
+                itemCheckBox.type = 'checkbox';
+                itemCheckBox.className = 'checkbox';
+                itemCheckBox.id = itemId;
+                itemCheckBox.value = itemName;
+                itemCheckBox.onchange = function() {updateFormInputs()}
+
+                const itemLabel = document.createElement('label');
+                itemLabel.appendChild(itemCheckBox);
+                itemLabel.appendChild(document.createTextNode(itemName));
+
+                const currentListDiv = document.getElementById('current-list-div');
+                currentListDiv.appendChild(itemLabel);
+
+                currentListDiv.appendChild(document.createElement('br'));
+            })
+        }
+
+        function updateFormInputs() {
+            const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+            const formInputItemIds = document.getElementById('item-ids');
+            const formInputItemNames = document.getElementById('item-names');
+
+            let formInputItemIdsValue = '';
+            let formInputItemNamesValue = '';
+
+            allCheckboxes.forEach(checkbox => {
+                if (!checkbox.checked) {
+                    formInputItemIdsValue += checkbox.id + '\n';
+                    formInputItemNamesValue += checkbox.value + '\n';
+                }
+            })
+
+            formInputItemIds.value = formInputItemIdsValue.trimEnd();
+            formInputItemNames.value = formInputItemNamesValue.trimEnd();
+        }
+
+        function submitData() {
+            const form = document.getElementById('hidden-form');
+            const iframe = document.getElementById('hidden-iframe');
+
+            isSubmitting = true;
+
+            iframe.onload = function () {
+                if (isSubmitting) {
+                    window.location.href = 'homepage.html';
+                }
+            }
+
+            form.submit();
+        }
+    </script>
+</head>
+<body>
+    <h1>Mark Delivered Items</h1>
+    <div>
+        <a href="homepage.html">Home</a>
+        <a href="mark-delivered-items.html">Mark Delivered Items</a>
+        <a href="edit-current-list.html">Edit Current List</a>
+        <a href="add-new-item.html">Add New Item</a>
+    </div>
+    <div id="current-list-div">
+        <h2>Current List</h2>
+    </div>
+    <form action="https://docs.google.com/forms/d/1otM5e3lonI_X9W0-f3Zkd1fmXPmhphDIg68gnxKxPpE/formResponse" method="POST" id="hidden-form" target="hidden-iframe">
+        <input type="hidden" name="entry.1523484194" id="item-ids" value="">
+        <input type="hidden" name="entry.170440467" id="item-names" value="">
+    </form>
+    <button onclick="submitData()">Save Changes</button>
+    <iframe name="hidden-iframe" id="hidden-iframe" style="display: none;"></iframe>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KG Order List</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: "Sarabun", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        div a {
+            display: flex;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        input[type="text"], 
+        input[type="number"], 
+        select {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+    </style>
+    <script>
+        async function getGoogleSheetData(sheetName) {
+            try {
+                const spreadsheetId = '1vcItq-vwIjsCMrcGKa111moXmEU4usUkS_BjQYTlcgk';
+                const url = `https://opensheet.elk.sh/${spreadsheetId}/${sheetName}`;
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                return data;
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function fetchCategoryItems(selectedCategoryElement) {
+            const selectedCategory = selectedCategoryElement.value;
+            const insertAfterElement = document.getElementById('insert-after');
+
+            if(!selectedCategory) {
+                insertAfterElement.innerHTML = '<option value="">Select Category First</option>';
+                insertAfterElement.disabled = true;
+                return;
+            }
+
+            insertAfterElement.disabled = true;
+
+            const allItemsData = await getGoogleSheetData('Items');
+
+            const categoryItems = allItemsData.filter(row => row['Category'] === selectedCategory);
+
+            insertAfterElement.innerHTML = '<option value="">Select</option>';
+
+            categoryItems.forEach(row => {
+                const option = document.createElement('option');
+
+                option.value = row['Item Name'];
+                option.textContent = row['Item Name'];
+
+                insertAfterElement.appendChild(option)
+            })
+
+            insertAfterElement.disabled = false;
+
+            updateHiddenInput(selectedCategoryElement);
+        }
+
+        function updateHiddenInput(dropdownElement) {
+            const hiddenInput = document.getElementById(`${dropdownElement.id}-hidden`);
+
+            hiddenInput.value = dropdownElement.value;
+        }
+
+        function submitData() {
+            const form = document.getElementById('hidden-form');
+            const iframe = document.getElementById('hidden-iframe');
+
+            isSubmitting = true;
+
+            iframe.onload = function () {
+                if (isSubmitting) {
+                    window.location.href = 'homepage.html';
+                }
+            }
+
+            form.submit();
+        }
+    </script>
+</head>
+<body>
+    <h1>Add New Item</h1>
+    <div>
+        <a href="homepage.html">Home</a>
+        <a href="mark-delivered-items.html">Mark Delivered Items</a>
+        <a href="edit-current-list.html">Edit Current List</a>
+        <a href="add-new-item.html">Add New Item</a>
+    </div>
+    <div class="form-container">
+        <form action="https://docs.google.com/forms/d/11jy4lLinqoCPZ6HFNcIBU6wp_4ujURUeBduhj7DYnws/formResponse" method="POST" id="hidden-form" target="hidden-iframe">
+            <h2>Details</h2>
+
+            <div class="form-group">
+                <label for="item-name">Item Name</label>
+                <input type="text" name="entry.1472301677" id="item-name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="category">Category</label>
+                <select name="category" id="category" onchange="fetchCategoryItems(this)" required>
+                    <option value="">Please Select</option>
+                    <option value="Front">Front</option>
+                    <option value="Vegetables">Vegetables</option>
+                    <option value="Kitchen">Kitchen</option>
+                    <option value="Meat">Meat</option>
+                    <option value="Starters">Starters</option>
+                </select>
+                <input type="hidden" name="entry.1897388242" id="category-hidden" value="">
+            </div>
+
+            <div class="form-group">
+                <label for="quantity">Quantity</label>
+                <input type="number" name="entry.374715622" id="quantity" min="0" max="10" required>
+            </div>
+
+            <div class="form-group">
+                <label for="insert-after">Insert After</label>
+                <select name="insert-after" id="insert-after" onchange="updateHiddenInput(this)" required>
+                    <option value="">Select Category First</option>
+                </select>
+                <input type="hidden" name="entry.593798105" id="insert-after-hidden" value="">
+            </div>
+
+            <button type="submit" onclick="submitData()">Add</button>
+        </form>
+    </div>
+    <iframe name="hidden-iframe" id="hidden-iframe" style="display: none;"></iframe>
+</body>
+</html>
