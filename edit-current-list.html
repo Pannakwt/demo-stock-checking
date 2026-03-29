@@ -130,6 +130,9 @@
                 const itemCategory = item['Category'];
                 const itemIncrementValue = parseInt(item['Increment Value']);
                 const itemUnitLabel = item['Unit Label'];
+                const itemDisabled = item['Disabled'];
+
+                if (itemDisabled === 'TRUE') {return;}
 
                 // checking whether the section is exist or not, if not then add section
                 let categoryContainer = document.getElementById(itemCategory.toLowerCase());
@@ -224,14 +227,18 @@
                 let [itemId, itemQuantity] = itemIdQuantity.split('x');
 
                 let itemCheckbox = document.getElementById(itemId);
-                itemCheckbox.checked = true;
-                
-                if (itemQuantity) {
-                    let quantityCount = document.getElementById(`quantity_${itemId}`);
-                    quantityCount.innerHTML = itemQuantity;
-                }
 
-                currentListIds.push(itemId);
+                // check whether item disabled or not
+                if (itemCheckbox) {
+                    itemCheckbox.checked = true;
+                
+                    if (itemQuantity) {
+                        let quantityCount = document.getElementById(`quantity_${itemId}`);
+                        quantityCount.innerHTML = itemQuantity;
+                    }
+
+                    currentListIds.push(itemId);
+                }
             })
         }
 

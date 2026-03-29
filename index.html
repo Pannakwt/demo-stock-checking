@@ -92,7 +92,14 @@
             let allItemsMap = {};
 
             allItemsData.forEach(item => {
-                allItemsMap[item['ID']] = {'Name': item['Item Name'], 'Unit': item['Unit Label']};
+                const itemDisabled = item['Disabled'];
+
+                if (itemDisabled === 'FALSE') {
+                    allItemsMap[item['ID']] = {
+                        'Name': item['Item Name'], 
+                        'Unit': item['Unit Label']
+                    };
+                }
             });
 
             return allItemsMap;
@@ -116,16 +123,18 @@
 
                 let [itemId, quantity] = itemIdQuantity.split('x')
                 
-                let itemName = allItemsMap[itemId]['Name']
-                let itemUnit = allItemsMap[itemId]['Unit']
+                if (itemId in allItemsMap) {
+                    let itemName = allItemsMap[itemId]['Name']
+                    let itemUnit = allItemsMap[itemId]['Unit']
 
-                itemInList.textContent = quantity
-                    ? `${itemName} ${quantity} ${itemUnit}`
-                    : itemName;
+                    itemInList.textContent = quantity
+                        ? `${itemName} ${quantity} ${itemUnit}`
+                        : itemName;
 
-                currentListBodyElement.appendChild(itemInList);
+                    currentListBodyElement.appendChild(itemInList);
 
-                formInputItemNamesValue += itemInList.textContent + '\n';
+                    formInputItemNamesValue += itemInList.textContent + '\n';
+                }
             })
 
             // add last updated time
