@@ -275,7 +275,7 @@
                         const li = document.createElement('li');
 
                         li.textContent = quantity
-                            ? `${checkbox.value} (${quantity}) ${unit}`
+                            ? `${checkbox.value} ${quantity} ${unit}`
                             : checkbox.value;
 
                         if (!currentListIds.includes(itemId)) {
@@ -319,7 +319,7 @@
                         : checkbox.id;
 
                     const itemNameQuantity = quantity
-                        ? `${checkbox.value} (${quantity}) ${unit}`
+                        ? `${checkbox.value} ${quantity} ${unit}`
                         : checkbox.value;
 
                     formInputItemIdsValue += itemIdQuantity + '\n';
