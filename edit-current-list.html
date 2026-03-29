@@ -127,22 +127,22 @@
             allItemsData.forEach(item => {
                 const itemId = item['ID'];
                 const itemName = item['Item Name'];
-                const category = item['Category'];
-                const quantity = parseInt(item['Quantity']);
+                const itemCategory = item['Category'];
+                const itemQuantity = parseInt(item['Quantity']);
 
                 // checking whether the section is exist or not, if not then add section
-                let categoryContainer = document.getElementById(category.toLowerCase());
+                let categoryContainer = document.getElementById(itemCategory.toLowerCase());
                 let categoryBody;
                 
                 if (!categoryContainer) {
                     categoryContainer = document.createElement('div');
                     categoryContainer.className = 'category-container';
-                    categoryContainer.id = category.toLowerCase();
+                    categoryContainer.id = itemCategory.toLowerCase();
 
                     // add category name
                     const categoryHeader = document.createElement('h3');
                     categoryHeader.className = 'category-header';
-                    categoryHeader.textContent = category;
+                    categoryHeader.textContent = itemCategory;
 
                     // add chevron before the header name
                     const chevron = document.createElement('span');
@@ -185,19 +185,19 @@
                 categoryBody.appendChild(itemLabel);
 
                 // add quantity select for some items
-                if (quantity !== 0) {
+                if (itemQuantity !== 0) {
                     const decreaseButton = document.createElement('button');
                     decreaseButton.className = 'quantitybtn';
-                    decreaseButton.onclick = function() {changeQuantity(itemId, 'decrease', quantity)};
+                    decreaseButton.onclick = function() {changeQuantity(itemId, 'decrease', itemQuantity)};
                     decreaseButton.innerHTML = '-';
 
-                    quantityCount = document.createElement('span');
+                    const quantityCount = document.createElement('span');
                     quantityCount.id = `quantity_${itemId}`;
-                    quantityCount.innerHTML = quantity;
+                    quantityCount.innerHTML = itemQuantity;
                     
                     const increaseButton = document.createElement('button');
                     increaseButton.className = 'quantitybtn';
-                    increaseButton.onclick = function() {changeQuantity(itemId, 'increase', quantity)};
+                    increaseButton.onclick = function() {changeQuantity(itemId, 'increase', itemQuantity)};
                     increaseButton.innerHTML = '+';
 
                     categoryBody.appendChild(decreaseButton);
@@ -215,25 +215,25 @@
             currentListIds = [];
 
             currentListIdQuantityArray.forEach(itemIdQuantity => {
-                let [itemId, quantity] = itemIdQuantity.split('x');
+                let [itemId, itemQuantity] = itemIdQuantity.split('x');
 
                 let itemCheckbox = document.getElementById(itemId);
                 itemCheckbox.checked = true;
                 
-                if (quantity) {
+                if (itemQuantity) {
                     let quantityCount = document.getElementById(`quantity_${itemId}`);
-                    quantityCount.innerHTML = quantity;
+                    quantityCount.innerHTML = itemQuantity;
                 }
 
                 currentListIds.push(itemId);
             })
         }
 
-        function changeQuantity(itemId, change, quantity) {
+        function changeQuantity(itemId, change, itemQuantity) {
             const quantityCount = document.getElementById(`quantity_${itemId}`)
 
             if (change === 'decrease') {
-                const quantityCountUpdated = parseInt(quantityCount.innerHTML) - quantity;
+                const quantityCountUpdated = parseInt(quantityCount.innerHTML) - itemQuantity;
 
                 // prevent quantity less than one
                 if (quantityCountUpdated > 0) {
@@ -241,7 +241,7 @@
                 }
 
             } else if (change === 'increase') {
-                quantityCount.innerHTML = parseInt(quantityCount.innerHTML) + quantity;
+                quantityCount.innerHTML = parseInt(quantityCount.innerHTML) + itemQuantity;
             }
         }
 
