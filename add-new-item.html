@@ -38,6 +38,12 @@
             font-size: 14px;
         }
 
+        #quantity-selection-questions {
+            display: none;
+            padding-left: 20px;
+            border-left: 3px solid;
+        }
+
         button {
             padding: 8px 16px;
             cursor: pointer;
@@ -99,19 +105,38 @@
             hiddenInput.value = dropdownElement.value;
         }
 
+        function addQuantitySelectionQuestions(radioState) {
+            const quantitySelectionQuestions = document.getElementById('quantity-selection-questions');
+            const incrementValue = document.getElementById('increment-value');
+            const unitLabel = document.getElementById('unit-label');
+
+            if (radioState.value === 'Yes') {
+                quantitySelectionQuestions.style.display = 'block';
+                incrementValue.required = true;
+                unitLabel.required = true;
+                
+            } else {
+                quantitySelectionQuestions.style.display = 'none';
+                incrementValue.required = false;
+                unitLabel.required = false;
+            }
+        }
+
         function submitData() {
             const form = document.getElementById('hidden-form');
             const iframe = document.getElementById('hidden-iframe');
 
-            isSubmitting = true;
+            if (form.reportValidity()) {
+                isSubmitting = true;
 
-            iframe.onload = function () {
-                if (isSubmitting) {
-                    window.location.href = 'index.html';
+                iframe.onload = function () {
+                    if (isSubmitting) {
+                        window.location.href = 'index.html';
+                    }
                 }
-            }
 
-            form.submit();
+                form.submit();
+            }
         }
     </script>
 </head>
@@ -146,8 +171,24 @@
             </div>
 
             <div class="form-group">
-                <label for="quantity">Quantity</label>
-                <input type="number" name="entry.374715622" id="quantity" min="0" max="10" required>
+                <p>Enable Quantity Selection?</p>
+                <label>
+                    <input type="radio" name="entry.387719916" value="No" onchange="addQuantitySelectionQuestions(this)" checked> No
+                </label>
+                <label>
+                    <input type="radio" name="entry.387719916" value="Yes" onchange="addQuantitySelectionQuestions(this)"> Yes
+                </label>
+            </div>
+
+            <div id="quantity-selection-questions">
+                <div class="form-group">
+                    <label for="increment-value">Increment Value (Step Amount)</label>
+                    <input type="number" name="entry.781358804" id="increment-value" min="1" max="100">
+                </div>
+                <div class="form-group">
+                    <label for="unit-label">Unit Label</label>
+                    <input type="text" name="entry.1843089101" id="unit-label">
+                </div>
             </div>
 
             <div class="form-group">
@@ -155,12 +196,7 @@
                 <select name="insert-after" id="insert-after" onchange="updateHiddenInput(this)" required>
                     <option value="">Select Category First</option>
                 </select>
-                <input type="hidden" name="entry.593798105" id="insert-after-hidden" value="">
-            </div>
-
-            <div class="form-group">
-                <label for="unit">Unit</label>
-                <input type="text" name="entry.1907781015" id="unit">
+                <input type="hidden" name="entry.358237544" id="insert-after-hidden" value="">
             </div>
 
             <button type="submit" onclick="submitData()">Add</button>
