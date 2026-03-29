@@ -128,7 +128,8 @@
                 const itemId = item['ID'];
                 const itemName = item['Item Name'];
                 const itemCategory = item['Category'];
-                const itemQuantity = parseInt(item['Quantity']);
+                const itemIncrementValue = parseInt(item['Increment Value']);
+                const itemUnitLabel = item['Unit Label'];
 
                 // checking whether the section is exist or not, if not then add section
                 let categoryContainer = document.getElementById(itemCategory.toLowerCase());
@@ -185,24 +186,29 @@
                 categoryBody.appendChild(itemLabel);
 
                 // add quantity select for some items
-                if (itemQuantity !== 0) {
+                if (itemIncrementValue) {
                     const decreaseButton = document.createElement('button');
                     decreaseButton.className = 'quantitybtn';
-                    decreaseButton.onclick = function() {changeQuantity(itemId, 'decrease', itemQuantity)};
+                    decreaseButton.onclick = function() {changeQuantity(itemId, 'decrease', itemIncrementValue)};
                     decreaseButton.innerHTML = '-';
 
                     const quantityCount = document.createElement('span');
                     quantityCount.id = `quantity_${itemId}`;
-                    quantityCount.innerHTML = itemQuantity;
+                    quantityCount.innerHTML = itemIncrementValue;
                     
                     const increaseButton = document.createElement('button');
                     increaseButton.className = 'quantitybtn';
-                    increaseButton.onclick = function() {changeQuantity(itemId, 'increase', itemQuantity)};
+                    increaseButton.onclick = function() {changeQuantity(itemId, 'increase', itemIncrementValue)};
                     increaseButton.innerHTML = '+';
+
+                    const unitLabel = document.createElement('span');
+                    unitLabel.id = `unit_${itemId}`;
+                    unitLabel.innerHTML = itemUnitLabel;
 
                     categoryBody.appendChild(decreaseButton);
                     categoryBody.appendChild(quantityCount);
                     categoryBody.appendChild(increaseButton);
+                    categoryBody.appendChild(unitLabel);
                 }
 
                 // new line
@@ -263,11 +269,13 @@
                         
                         const quantityElement = document.getElementById(`quantity_${itemId}`);
                         const quantity = quantityElement?.textContent;
+                        const unitElement = document.getElementById(`unit_${itemId}`);
+                        const unit = unitElement?.textContent;
 
                         const li = document.createElement('li');
 
                         li.textContent = quantity
-                            ? `${checkbox.value} (${quantity})`
+                            ? `${checkbox.value} (${quantity}) ${unit}`
                             : checkbox.value;
 
                         if (!currentListIds.includes(itemId)) {
@@ -303,13 +311,15 @@
                 if (checkbox.checked) {
                     const quantityElement = document.getElementById(`quantity_${checkbox.id}`);
                     const quantity = quantityElement?.textContent;
+                    const unitElement = document.getElementById(`unit_${checkbox.id}`);
+                    const unit = unitElement?.textContent;
 
                     const itemIdQuantity = quantity
                         ? `${checkbox.id}x${quantity}`
                         : checkbox.id;
 
                     const itemNameQuantity = quantity
-                        ? `${checkbox.value} (${quantity})`
+                        ? `${checkbox.value} (${quantity}) ${unit}`
                         : checkbox.value;
 
                     formInputItemIdsValue += itemIdQuantity + '\n';

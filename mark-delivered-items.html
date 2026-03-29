@@ -58,7 +58,7 @@
             let allItemsMap = {};
 
             allItemsData.forEach(item => {
-                allItemsMap[item['ID']] = item['Item Name']
+                allItemsMap[item['ID']] = {'Name': item['Item Name'], 'Unit': item['Unit Label']};
             });
 
             return allItemsMap;
@@ -74,11 +74,12 @@
             currentListIdQuantityArray.forEach(itemIdQuantity => {
                 let [itemId, quantity] = itemIdQuantity.split('x')
 
-                let itemName = allItemsMap[itemId]
+                let itemName = allItemsMap[itemId]['Name']
+                let itemUnit = allItemsMap[itemId]['Unit']
 
                 if (quantity) {
                     itemId = `${itemId}x${quantity}`;
-                    itemName = `${itemName} (${quantity})`;
+                    itemName = `${itemName} (${quantity}) ${itemUnit}`;
                 }
 
                 const itemCheckBox = document.createElement('input');
