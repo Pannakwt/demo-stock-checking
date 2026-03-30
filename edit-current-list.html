@@ -96,6 +96,38 @@
             vertical-align: middle;
             letter-spacing: 0.5px;
         }
+
+        #status-container {
+            display: none;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        #status-text {
+            margin-top: 15px;
+        }
+
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-tick {
+            color: #28a745;
+            font-size: 50px;
+            line-height: 50px;
+            font-weight: bold;
+        }
     </style>
     <script>
         let isSubmitting = false;
@@ -306,7 +338,7 @@
             }
         }
 
-        function submitData() {
+        async function submitData() {
             const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
             const formInputItemIds = document.getElementById('item-ids');
             const formInputItemNames = document.getElementById('item-names');
@@ -342,13 +374,60 @@
 
             isSubmitting = true;
 
+            let startTime = Date.now();
+
+            // ui switch - hide form and show saving spinner
+            document.getElementById('edit-container').style.display = 'none';
+            document.getElementById('status-container').style.display = 'block';
+
+            // polling logic
+            const checkDataUpdated = async () => {
+                const secondsElapsed = (Date.now() - startTime) / 1000;
+
+                if (secondsElapsed > 90) {
+                    console.warn('polling timed out');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                try {
+                    const allOrderListsData = await getGoogleSheetData('Order List History');
+                    const currentListIdQuantity = allOrderListsData[allOrderListsData.length - 1]['Item IDs'];
+
+                    if (currentListIdQuantity === formInputItemIds.value) {
+                        showSuccessAndRedirect();
+                    } else {
+                        setTimeout(checkDataUpdated, 5000);
+                    }
+
+                } catch (error) {
+                    console.error('polling error:', error);
+
+                    setTimeout(checkDataUpdated, 5000);
+                }
+            };
+
             iframe.onload = function () {
                 if (isSubmitting) {
-                    window.location.href = 'index.html';
+                    checkDataUpdated();
                 }
             }
 
             form.submit();
+        }
+
+        function showSuccessAndRedirect() {
+            const statusIcon = document.getElementById('status-icon');
+            const statusText = document.getElementById('status-text');
+
+            statusIcon.classList.remove('spinner');
+            statusIcon.innerHTML = '✔';
+            statusIcon.classList.add('success-tick');
+            statusText.innerText = 'Change Saved';
+
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 2000);
         }
 
         function toggleClearConfirmation(showConfirm) {
@@ -383,28 +462,34 @@
     </div>
     <div id="current-list-div">
         <h2>Current List</h2>
-        <div class="action-bar">
-            <div id="initial-actions">
-                <button class="btn save" onclick="toggleSaveConfirmation(true)">Save Changes</button>
-                <button class="btn clear" onclick="toggleClearConfirmation(true)">Clear Selection</button>
-            </div>
+        <div id="edit-container">
+            <div class="action-bar">
+                <div id="initial-actions">
+                    <button class="btn save" onclick="toggleSaveConfirmation(true)">Save Changes</button>
+                    <button class="btn clear" onclick="toggleClearConfirmation(true)">Clear Selection</button>
+                </div>
 
-            <div id="confirm-save" class="hidden">
-                <span>Save Changes?</span>
-                <button class="btn yes" onclick="submitData()">Yes</button>
-                <button class="btn no" onclick="toggleSaveConfirmation(false)">No</button>
-            </div>
+                <div id="confirm-save" class="hidden">
+                    <span>Save Changes?</span>
+                    <button class="btn yes" onclick="submitData()">Yes</button>
+                    <button class="btn no" onclick="toggleSaveConfirmation(false)">No</button>
+                </div>
 
-            <div id="confirm-clear" class="hidden">
-                <span>Clear Selection?</span>
-                <button class="btn yes" onclick="untickAllCheckboxes()">Yes</button>
-                <button class="btn no" onclick="toggleClearConfirmation(false)">No</button>
+                <div id="confirm-clear" class="hidden">
+                    <span>Clear Selection?</span>
+                    <button class="btn yes" onclick="untickAllCheckboxes()">Yes</button>
+                    <button class="btn no" onclick="toggleClearConfirmation(false)">No</button>
+                </div>
+            </div>
+            <div id="current-list-div-body"></div>
+            <div id="current-list-div-summary" class="hidden">
+                <h2>Items</h2>
+                <ul id="current-list-div-summary-body"></ul>
             </div>
         </div>
-        <div id="current-list-div-body"></div>
-        <div id="current-list-div-summary" class="hidden">
-            <h2>Items</h2>
-            <ul id="current-list-div-summary-body"></ul>
+        <div id="status-container">
+            <div id="status-icon" class="spinner"></div>
+            <p id="status-text">Saving Data</p>
         </div>
         <form action="https://docs.google.com/forms/d/1otM5e3lonI_X9W0-f3Zkd1fmXPmhphDIg68gnxKxPpE/formResponse" method="POST" id="hidden-form" target="hidden-iframe">
             <input type="hidden" name="entry.1523484194" id="item-ids" value="">

@@ -17,10 +17,43 @@
             display: flex;
         }
 
+        .hidden {
+            display: none !important;
+        }
+
+        #edit-container div {
+            margin-bottom: 20px;
+        }
+
         .checkbox {
             margin-right: 8px;
             margin-bottom: 6px;
             zoom: 1.2;
+        }
+
+        li {
+            margin-bottom: 3px;
+            align-items: center;
+        }
+
+        .badge-delivered {
+            background-color: #cf142b;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2px 7px;
+            margin-left: 10px;
+            border-radius: 4px;
+            display: inline-block;
+            vertical-align: middle;
+            letter-spacing: 0.5px;
+        }
+
+        #confirm-save {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         button {
@@ -28,6 +61,38 @@
             cursor: pointer;
             border-radius: 4px;
             border: 1px solid #ccc;
+        }
+
+        #status-container {
+            display: none;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        #status-text {
+            margin-top: 15px;
+        }
+
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-tick {
+            color: #28a745;
+            font-size: 50px;
+            line-height: 50px;
+            font-weight: bold;
         }
     </style>
     <script>
@@ -95,21 +160,62 @@
                     itemCheckBox.className = 'checkbox';
                     itemCheckBox.id = itemId;
                     itemCheckBox.value = itemName;
-                    itemCheckBox.onchange = function() {updateFormInputs()}
 
                     const itemLabel = document.createElement('label');
                     itemLabel.appendChild(itemCheckBox);
                     itemLabel.appendChild(document.createTextNode(itemName));
 
-                    const currentListDiv = document.getElementById('current-list-div');
-                    currentListDiv.appendChild(itemLabel);
+                    const currentListDivBody = document.getElementById('current-list-div-body');
+                    currentListDivBody.appendChild(itemLabel);
 
-                    currentListDiv.appendChild(document.createElement('br'));
+                    currentListDivBody.appendChild(document.createElement('br'));
                 }
             })
         }
 
-        function updateFormInputs() {
+        function toggleSaveConfirmation(showConfirm) {
+            const header = document.getElementById('current-list-div-header')
+            const initial = document.getElementById('initial-action');
+            const confirm = document.getElementById('confirm-save');
+            const body = document.getElementById('current-list-div-body');
+            const summary = document.getElementById('current-list-div-summary');
+
+            if (showConfirm) {
+                const summaryBody = document.getElementById('current-list-div-summary-body');
+                summaryBody.textContent = '';
+
+                const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+
+                allCheckboxes.forEach(checkbox => {
+                    const li = document.createElement('li');
+
+                    if (checkbox.checked) {
+                        li.innerHTML = checkbox.value.strike();
+                        li.innerHTML += ' <span class="badge-delivered">Delivered</span>'
+
+                    } else {
+                        li.innerHTML = checkbox.value
+                    }
+
+                    summaryBody.appendChild(li);
+                })
+
+                header.textContent = 'Confirm Changes?'
+                initial.classList.add('hidden');
+                confirm.classList.remove('hidden');
+                body.classList.add('hidden');
+                summary.classList.remove('hidden');
+
+            } else {
+                header.textContent = 'Current List';
+                initial.classList.remove('hidden');
+                confirm.classList.add('hidden');
+                body.classList.remove('hidden');
+                summary.classList.add('hidden');
+            }
+        }
+
+        function submitData() {
             const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
             const formInputItemIds = document.getElementById('item-ids');
             const formInputItemNames = document.getElementById('item-names');
@@ -126,21 +232,66 @@
 
             formInputItemIds.value = formInputItemIdsValue.trimEnd();
             formInputItemNames.value = formInputItemNamesValue.trimEnd();
-        }
 
-        function submitData() {
             const form = document.getElementById('hidden-form');
             const iframe = document.getElementById('hidden-iframe');
 
             isSubmitting = true;
 
+            let startTime = Date.now();
+
+            // ui switch - hide form and show saving spinner
+            document.getElementById('edit-container').style.display = 'none';
+            document.getElementById('status-container').style.display = 'block';
+
+            // polling logic
+            const checkDataUpdated = async () => {
+                const secondsElapsed = (Date.now() - startTime) / 1000;
+
+                if (secondsElapsed > 90) {
+                    console.warn('polling timed out');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                try {
+                    const allOrderListsData = await getGoogleSheetData('Order List History');
+                    const currentListIdQuantity = allOrderListsData[allOrderListsData.length - 1]['Item IDs'];
+
+                    if (currentListIdQuantity === formInputItemIds.value) {
+                        showSuccessAndRedirect();
+                    } else {
+                        setTimeout(checkDataUpdated, 5000);
+                    }
+
+                } catch (error) {
+                    console.error('polling error:', error);
+
+                    setTimeout(checkDataUpdated, 5000);
+                }
+            };
+
             iframe.onload = function () {
                 if (isSubmitting) {
-                    window.location.href = 'index.html';
+                    checkDataUpdated();
                 }
             }
 
             form.submit();
+        }
+
+        function showSuccessAndRedirect() {
+            const statusIcon = document.getElementById('status-icon');
+            const statusText = document.getElementById('status-text');
+
+            statusIcon.classList.remove('spinner');
+            statusIcon.innerHTML = '✔';
+            statusIcon.classList.add('success-tick');
+            statusText.innerText = 'Change Saved';
+
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 2000);
         }
     </script>
 </head>
@@ -153,13 +304,29 @@
         <a href="add-new-item.html">Add New Item</a>
     </div>
     <div id="current-list-div">
-        <h2>Current List</h2>
+        <h2 id="current-list-div-header">Current List</h2>
+        <div id="edit-container">
+            <div id="current-list-div-body"></div>
+            <div id="current-list-div-summary" class="hidden">
+                <ul id="current-list-div-summary-body"></ul>
+            </div>
+            <div id="initial-action">
+                <button onclick="toggleSaveConfirmation(true)">Save Changes</button>
+            </div>
+            <div id="confirm-save" class="hidden">
+                <button onclick="submitData()">Yes</button>
+                <button onclick="toggleSaveConfirmation(false)">No</button>
+            </div>
+        </div>
+        <div id="status-container">
+            <div id="status-icon" class="spinner"></div>
+            <p id="status-text">Saving Data</p>
+        </div>
     </div>
     <form action="https://docs.google.com/forms/d/1otM5e3lonI_X9W0-f3Zkd1fmXPmhphDIg68gnxKxPpE/formResponse" method="POST" id="hidden-form" target="hidden-iframe">
         <input type="hidden" name="entry.1523484194" id="item-ids" value="">
         <input type="hidden" name="entry.170440467" id="item-names" value="">
     </form>
-    <button onclick="submitData()">Save Changes</button>
     <iframe name="hidden-iframe" id="hidden-iframe" style="display: none;"></iframe>
 </body>
 </html>
