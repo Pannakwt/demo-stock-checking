@@ -70,7 +70,7 @@
             zoom: 1.2;
         }
 
-        .quantitybtn {
+        .quantity-button {
             margin-left: 8px;
             margin-right: 8px;
             cursor: pointer;
@@ -212,42 +212,47 @@
                 itemCheckBox.id = itemId;
                 itemCheckBox.value = itemName;
 
-                // add item label
+                // add item checkbox to item label
                 const itemLabel = document.createElement('label');
                 itemLabel.appendChild(itemCheckBox);
                 itemLabel.appendChild(document.createTextNode(itemName));
 
-                // add item to their category
-                categoryBody.appendChild(itemLabel);
+                // add item label to item container
+                const itemContainer = document.createElement('div');
+                itemContainer.className = 'item-container';
+                itemContainer.appendChild(itemLabel);
 
-                // add quantity select for some items
+                // add quanlity control element to item container
                 if (itemIncrementValue) {
                     const decreaseButton = document.createElement('button');
-                    decreaseButton.className = 'quantitybtn';
+                    decreaseButton.className = 'quantity-button hidden';
+                    decreaseButton.id = `decrease-${itemId}`;
                     decreaseButton.onclick = function() {changeQuantity(itemId, 'decrease', itemIncrementValue)};
                     decreaseButton.innerHTML = '-';
 
                     const quantityCount = document.createElement('span');
-                    quantityCount.id = `quantity_${itemId}`;
-                    quantityCount.innerHTML = itemIncrementValue;
+                    quantityCount.className = 'hidden'
+                    quantityCount.id = `quantity-${itemId}`;
+                    quantityCount.innerHTML = 0;
                     
                     const increaseButton = document.createElement('button');
-                    increaseButton.className = 'quantitybtn';
+                    increaseButton.className = 'quantity-button';
                     increaseButton.onclick = function() {changeQuantity(itemId, 'increase', itemIncrementValue)};
                     increaseButton.innerHTML = '+';
 
                     const unitLabel = document.createElement('span');
-                    unitLabel.id = `unit_${itemId}`;
+                    unitLabel.className = 'hidden';
+                    unitLabel.id = `unit-${itemId}`;
                     unitLabel.innerHTML = itemUnitLabel;
 
-                    categoryBody.appendChild(decreaseButton);
-                    categoryBody.appendChild(quantityCount);
-                    categoryBody.appendChild(increaseButton);
-                    categoryBody.appendChild(unitLabel);
+                    itemContainer.appendChild(decreaseButton);
+                    itemContainer.appendChild(quantityCount);
+                    itemContainer.appendChild(increaseButton);
+                    itemContainer.appendChild(unitLabel);
                 }
 
-                // new line
-                categoryBody.appendChild(document.createElement('br'));
+                // add item container to their category
+                categoryBody.appendChild(itemContainer);
             })
 
             // update list with current list data
@@ -264,9 +269,16 @@
                 if (itemCheckbox) {
                     itemCheckbox.checked = true;
                 
-                    if (itemQuantity) {
-                        let quantityCount = document.getElementById(`quantity_${itemId}`);
+                    if (itemQuantity && parseInt(itemQuantity) !== 0) {
+                        const decreaseButton = document.getElementById(`decrease-${itemId}`);
+                        const quantityCount = document.getElementById(`quantity-${itemId}`);
+                        const unitLabel = document.getElementById(`unit-${itemId}`);
+
                         quantityCount.innerHTML = itemQuantity;
+
+                        decreaseButton.classList.remove('hidden');
+                        quantityCount.classList.remove('hidden');
+                        unitLabel.classList.remove('hidden');
                     }
 
                     currentListIds.push(itemId);
@@ -274,20 +286,33 @@
             })
         }
 
-        function changeQuantity(itemId, change, itemQuantity) {
-            const quantityCount = document.getElementById(`quantity_${itemId}`)
+        function changeQuantity(itemId, change, itemIncrementValue) {
+            const decreaseButton = document.getElementById(`decrease-${itemId}`);
+            const quantityCount = document.getElementById(`quantity-${itemId}`);
+            const unitLabel = document.getElementById(`unit-${itemId}`);
+
+            const quantity = parseInt(quantityCount.textContent);
+            let quantityCountUpdated;
 
             if (change === 'decrease') {
-                const quantityCountUpdated = parseInt(quantityCount.innerHTML) - itemQuantity;
-
-                // prevent quantity less than one
-                if (quantityCountUpdated > 0) {
-                    quantityCount.innerHTML = quantityCountUpdated;
-                }
+                quantityCountUpdated = quantity - itemIncrementValue;
 
             } else if (change === 'increase') {
-                quantityCount.innerHTML = parseInt(quantityCount.innerHTML) + itemQuantity;
+                quantityCountUpdated = quantity + itemIncrementValue;
             }
+
+            if (quantity === 0) {
+                decreaseButton.classList.remove('hidden');
+                quantityCount.classList.remove('hidden');
+                unitLabel.classList.remove('hidden');
+
+            } else if (quantityCountUpdated === 0) {
+                decreaseButton.classList.add('hidden');
+                quantityCount.classList.add('hidden');
+                unitLabel.classList.add('hidden');
+            }
+
+            quantityCount.textContent = quantityCountUpdated;
         }
 
         function toggleSaveConfirmation(showConfirm) {
@@ -306,14 +331,14 @@
                     if (checkbox.checked) {
                         const itemId = checkbox.id;
                         
-                        const quantityElement = document.getElementById(`quantity_${itemId}`);
+                        const quantityElement = document.getElementById(`quantity-${itemId}`);
                         const quantity = quantityElement?.textContent;
-                        const unitElement = document.getElementById(`unit_${itemId}`);
+                        const unitElement = document.getElementById(`unit-${itemId}`);
                         const unit = unitElement?.textContent;
 
                         const li = document.createElement('li');
 
-                        li.textContent = quantity
+                        li.textContent = quantity && quantity > 0
                             ? `${checkbox.value} ${quantity} ${unit}`
                             : checkbox.value;
 
@@ -348,16 +373,16 @@
 
             allCheckboxes.forEach(checkbox => {
                 if (checkbox.checked) {
-                    const quantityElement = document.getElementById(`quantity_${checkbox.id}`);
+                    const quantityElement = document.getElementById(`quantity-${checkbox.id}`);
                     const quantity = quantityElement?.textContent;
-                    const unitElement = document.getElementById(`unit_${checkbox.id}`);
+                    const unitElement = document.getElementById(`unit-${checkbox.id}`);
                     const unit = unitElement?.textContent;
 
                     const itemIdQuantity = quantity
                         ? `${checkbox.id}x${quantity}`
                         : checkbox.id;
 
-                    const itemNameQuantity = quantity
+                    const itemNameQuantity = quantity && quantity > 0
                         ? `${checkbox.value} ${quantity} ${unit}`
                         : checkbox.value;
 

@@ -127,7 +127,7 @@
                     let itemName = allItemsMap[itemId]['Name']
                     let itemUnit = allItemsMap[itemId]['Unit']
 
-                    itemInList.textContent = quantity
+                    itemInList.textContent = quantity && quantity > 0
                         ? `${itemName} ${quantity} ${itemUnit}`
                         : itemName;
 

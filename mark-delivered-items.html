@@ -150,15 +150,14 @@
                     let itemName = allItemsMap[itemId]['Name']
                     let itemUnit = allItemsMap[itemId]['Unit']
 
-                    if (quantity) {
-                        itemId = `${itemId}x${quantity}`;
-                        itemName = `${itemName} ${quantity} ${itemUnit}`;
-                    }
+                    itemName = quantity && quantity > 0
+                        ? `${itemName} ${quantity} ${itemUnit}`
+                        : itemName;
 
                     const itemCheckBox = document.createElement('input');
                     itemCheckBox.type = 'checkbox';
                     itemCheckBox.className = 'checkbox';
-                    itemCheckBox.id = itemId;
+                    itemCheckBox.id = itemIdQuantity;
                     itemCheckBox.value = itemName;
 
                     const itemLabel = document.createElement('label');
