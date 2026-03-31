@@ -173,7 +173,7 @@
         }
 
         function toggleSaveConfirmation(showConfirm) {
-            const header = document.getElementById('current-list-div-header')
+            const header = document.getElementById('current-list-div-header');
             const initial = document.getElementById('initial-action');
             const confirm = document.getElementById('confirm-save');
             const body = document.getElementById('current-list-div-body');
@@ -190,16 +190,16 @@
 
                     if (checkbox.checked) {
                         li.innerHTML = checkbox.value.strike();
-                        li.innerHTML += ' <span class="badge-delivered">Delivered</span>'
+                        li.innerHTML += ' <span class="badge-delivered">Delivered</span>';
 
                     } else {
-                        li.innerHTML = checkbox.value
+                        li.innerHTML = checkbox.value;
                     }
 
                     summaryBody.appendChild(li);
                 })
 
-                header.textContent = 'Confirm Changes?'
+                header.textContent = 'Confirm Changes?';
                 initial.classList.add('hidden');
                 confirm.classList.remove('hidden');
                 body.classList.add('hidden');

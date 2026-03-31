@@ -193,7 +193,7 @@
                     // add categody body storing checkboxes
                     categoryBody = document.createElement('div');
                     categoryBody.className = 'category-body';
-                    categoryBody.id = `${categoryContainer.id}-items`
+                    categoryBody.id = `${categoryContainer.id}-items`;
 
                     categoryContainer.appendChild(categoryBody);
 
@@ -202,7 +202,7 @@
                     currentListDivBody.appendChild(categoryContainer);
 
                 } else {
-                    categoryBody = document.getElementById(`${categoryContainer.id}-items`)
+                    categoryBody = document.getElementById(`${categoryContainer.id}-items`);
                 }
 
                 // add item checkbox
@@ -231,7 +231,7 @@
                     decreaseButton.innerHTML = '-';
 
                     const quantityCount = document.createElement('span');
-                    quantityCount.className = 'hidden'
+                    quantityCount.className = 'hidden';
                     quantityCount.id = `quantity-${itemId}`;
                     quantityCount.innerHTML = 0;
                     
@@ -343,7 +343,7 @@
                             : checkbox.value;
 
                         if (!currentListIds.includes(itemId)) {
-                            li.innerHTML += ' <span class="badge-new">New</span>'
+                            li.innerHTML += ' <span class="badge-new">New</span>';
                         }
 
                         summaryBody.appendChild(li);
