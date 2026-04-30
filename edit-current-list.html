@@ -1,526 +1,68 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KG Order List</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
-    <style>
-        * {
-            font-family: "Sarabun", sans-serif;
-            font-weight: 400;
-            font-style: normal;
-        }
-
-        div a {
-            display: flex;
-        }
-
-        .action-bar div {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            cursor: pointer;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-
-        .chevron {
-            width: 0;
-            height: 0;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-top: 8px solid #333;
-            margin-right: 10px;
-            transition: transform 0.3s ease;
-            transform: rotate(0deg);
-        }
-
-        .category-header {
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            user-select: none;
-        }
-
-        .category-body {
-            padding-left: 15px;
-        }
-
-        .category-container.closed .chevron {
-            transform: rotate(-90deg);
-        }
-
-        .category-container.closed .category-body {
-            display: none;
-        }
-
-        .checkbox {
-            margin-right: 8px;
-            margin-bottom: 6px;
-            zoom: 1.2;
-        }
-
-        .quantity-button {
-            margin-left: 8px;
-            margin-right: 8px;
-            cursor: pointer;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-
-        li {
-            margin-bottom: 3px;
-            align-items: center;
-        }
-
-        .badge-new {
-            background-color: #27ae60;
-            color: #ffffff;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            padding: 2px 7px;
-            margin-left: 10px;
-            border-radius: 4px;
-            display: inline-block;
-            vertical-align: middle;
-            letter-spacing: 0.5px;
-        }
-
-        #status-container {
-            display: none;
-            text-align: center;
-            margin-top: 50px;
-        }
-
-        #status-text {
-            margin-top: 15px;
-        }
-
-        .spinner {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .success-tick {
-            color: #28a745;
-            font-size: 50px;
-            line-height: 50px;
-            font-weight: bold;
-        }
-    </style>
-    <script>
-        let isSubmitting = false;
-
-        document.addEventListener('DOMContentLoaded', function() {
-            loadFullListWithCheckboxesTick();
-        })
-
-        async function getGoogleSheetData(sheetName) {
-            try {
-                const spreadsheetId = '1vcItq-vwIjsCMrcGKa111moXmEU4usUkS_BjQYTlcgk';
-                const url = `https://opensheet.elk.sh/${spreadsheetId}/${sheetName}`;
-
-                const response = await fetch(url);
-                const data = await response.json();
-
-                return data;
-
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-
-        async function loadFullListWithCheckboxesTick() {
-            const allItemsData = await getGoogleSheetData('Items');
-            const allOrderListsData = await getGoogleSheetData('Order List History');
-
-            // loop through each item, and add it to the body
-            allItemsData.forEach(item => {
-                const itemId = item['ID'];
-                const itemName = item['Item Name'];
-                const itemCategory = item['Category'];
-                const itemIncrementValue = parseInt(item['Increment Value']);
-                const itemUnitLabel = item['Unit Label'];
-                const itemDisabled = item['Disabled'];
-
-                if (itemDisabled === 'TRUE') {return;}
-
-                // checking whether the section is exist or not, if not then add section
-                let categoryContainer = document.getElementById(itemCategory.toLowerCase());
-                let categoryBody;
-                
-                if (!categoryContainer) {
-                    categoryContainer = document.createElement('div');
-                    categoryContainer.className = 'category-container';
-                    categoryContainer.id = itemCategory.toLowerCase();
-
-                    // add category name
-                    const categoryHeader = document.createElement('h3');
-                    categoryHeader.className = 'category-header';
-                    categoryHeader.textContent = itemCategory;
-
-                    // add chevron before the header name
-                    const chevron = document.createElement('span');
-                    chevron.className = 'chevron';
-
-                    categoryHeader.prepend(chevron);
-
-                    categoryHeader.onclick = function () {this.parentElement.classList.toggle('closed');}
-
-                    categoryContainer.appendChild(categoryHeader);
-
-                    // add categody body storing checkboxes
-                    categoryBody = document.createElement('div');
-                    categoryBody.className = 'category-body';
-                    categoryBody.id = `${categoryContainer.id}-items`;
-
-                    categoryContainer.appendChild(categoryBody);
-
-                    // add category to body
-                    const currentListDivBody = document.getElementById('current-list-div-body');
-                    currentListDivBody.appendChild(categoryContainer);
-
-                } else {
-                    categoryBody = document.getElementById(`${categoryContainer.id}-items`);
-                }
-
-                // add item checkbox
-                const itemCheckBox = document.createElement('input');
-                itemCheckBox.type = 'checkbox';
-                itemCheckBox.className = 'checkbox';
-                itemCheckBox.id = itemId;
-                itemCheckBox.value = itemName;
-
-                // add item checkbox to item label
-                const itemLabel = document.createElement('label');
-                itemLabel.appendChild(itemCheckBox);
-                itemLabel.appendChild(document.createTextNode(itemName));
-
-                // add item label to item container
-                const itemContainer = document.createElement('div');
-                itemContainer.className = 'item-container';
-                itemContainer.appendChild(itemLabel);
-
-                // add quanlity control element to item container
-                if (itemIncrementValue) {
-                    const decreaseButton = document.createElement('button');
-                    decreaseButton.className = 'quantity-button hidden';
-                    decreaseButton.id = `decrease-${itemId}`;
-                    decreaseButton.onclick = function() {changeQuantity(itemId, 'decrease', itemIncrementValue)};
-                    decreaseButton.innerHTML = '-';
-
-                    const quantityCount = document.createElement('span');
-                    quantityCount.className = 'hidden';
-                    quantityCount.id = `quantity-${itemId}`;
-                    quantityCount.innerHTML = 0;
-                    
-                    const increaseButton = document.createElement('button');
-                    increaseButton.className = 'quantity-button';
-                    increaseButton.onclick = function() {changeQuantity(itemId, 'increase', itemIncrementValue)};
-                    increaseButton.innerHTML = '+';
-
-                    const unitLabel = document.createElement('span');
-                    unitLabel.className = 'hidden';
-                    unitLabel.id = `unit-${itemId}`;
-                    unitLabel.innerHTML = itemUnitLabel;
-
-                    itemContainer.appendChild(decreaseButton);
-                    itemContainer.appendChild(quantityCount);
-                    itemContainer.appendChild(increaseButton);
-                    itemContainer.appendChild(unitLabel);
-                }
-
-                // add item container to their category
-                categoryBody.appendChild(itemContainer);
-            })
-
-            // update list with current list data
-            const currentListIdQuantity = allOrderListsData[allOrderListsData.length - 1]['Item IDs'];
-            const currentListIdQuantityArray = currentListIdQuantity.split('\n');
-            currentListIds = [];
-
-            currentListIdQuantityArray.forEach(itemIdQuantity => {
-                let [itemId, itemQuantity] = itemIdQuantity.split('x');
-
-                let itemCheckbox = document.getElementById(itemId);
-
-                // check whether item disabled or not
-                if (itemCheckbox) {
-                    itemCheckbox.checked = true;
-                
-                    if (itemQuantity && parseInt(itemQuantity) !== 0) {
-                        const decreaseButton = document.getElementById(`decrease-${itemId}`);
-                        const quantityCount = document.getElementById(`quantity-${itemId}`);
-                        const unitLabel = document.getElementById(`unit-${itemId}`);
-
-                        quantityCount.innerHTML = itemQuantity;
-
-                        decreaseButton.classList.remove('hidden');
-                        quantityCount.classList.remove('hidden');
-                        unitLabel.classList.remove('hidden');
-                    }
-
-                    currentListIds.push(itemId);
-                }
-            })
-        }
-
-        function changeQuantity(itemId, change, itemIncrementValue) {
-            const decreaseButton = document.getElementById(`decrease-${itemId}`);
-            const quantityCount = document.getElementById(`quantity-${itemId}`);
-            const unitLabel = document.getElementById(`unit-${itemId}`);
-
-            const quantity = parseInt(quantityCount.textContent);
-            let quantityCountUpdated;
-
-            if (change === 'decrease') {
-                quantityCountUpdated = quantity - itemIncrementValue;
-
-            } else if (change === 'increase') {
-                quantityCountUpdated = quantity + itemIncrementValue;
-            }
-
-            if (quantity === 0) {
-                decreaseButton.classList.remove('hidden');
-                quantityCount.classList.remove('hidden');
-                unitLabel.classList.remove('hidden');
-
-            } else if (quantityCountUpdated === 0) {
-                decreaseButton.classList.add('hidden');
-                quantityCount.classList.add('hidden');
-                unitLabel.classList.add('hidden');
-            }
-
-            quantityCount.textContent = quantityCountUpdated;
-        }
-
-        function toggleSaveConfirmation(showConfirm) {
-            const initial = document.getElementById('initial-actions');
-            const confirm = document.getElementById('confirm-save');
-            const body = document.getElementById('current-list-div-body');
-            const summary = document.getElementById('current-list-div-summary');
-
-            if (showConfirm) {
-                const summaryBody = document.getElementById('current-list-div-summary-body');
-                summaryBody.textContent = '';
-
-                const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-
-                allCheckboxes.forEach(checkbox => {
-                    if (checkbox.checked) {
-                        const itemId = checkbox.id;
-                        
-                        const quantityElement = document.getElementById(`quantity-${itemId}`);
-                        const quantity = quantityElement?.textContent;
-                        const unitElement = document.getElementById(`unit-${itemId}`);
-                        const unit = unitElement?.textContent;
-
-                        const li = document.createElement('li');
-
-                        li.textContent = quantity && quantity > 0
-                            ? `${checkbox.value} ${quantity} ${unit}`
-                            : checkbox.value;
-
-                        if (!currentListIds.includes(itemId)) {
-                            li.innerHTML += ' <span class="badge-new">New</span>';
-                        }
-
-                        summaryBody.appendChild(li);
-                    }
-                })
-
-                initial.classList.add('hidden');
-                confirm.classList.remove('hidden');
-                body.classList.add('hidden');
-                summary.classList.remove('hidden');
-
-            } else {
-                initial.classList.remove('hidden');
-                confirm.classList.add('hidden');
-                body.classList.remove('hidden');
-                summary.classList.add('hidden');
-            }
-        }
-
-        async function submitData() {
-            const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-            const formInputItemIds = document.getElementById('item-ids');
-            const formInputItemNames = document.getElementById('item-names');
-
-            let formInputItemIdsValue = '';
-            let formInputItemNamesValue = '';
-
-            allCheckboxes.forEach(checkbox => {
-                if (checkbox.checked) {
-                    const quantityElement = document.getElementById(`quantity-${checkbox.id}`);
-                    const quantity = quantityElement?.textContent;
-                    const unitElement = document.getElementById(`unit-${checkbox.id}`);
-                    const unit = unitElement?.textContent;
-
-                    const itemIdQuantity = quantity
-                        ? `${checkbox.id}x${quantity}`
-                        : checkbox.id;
-
-                    const itemNameQuantity = quantity && quantity > 0
-                        ? `${checkbox.value} ${quantity} ${unit}`
-                        : checkbox.value;
-
-                    formInputItemIdsValue += itemIdQuantity + '\n';
-                    formInputItemNamesValue += itemNameQuantity + '\n';
-                }
-
-                formInputItemIds.value = formInputItemIdsValue.trimEnd();
-                formInputItemNames.value = formInputItemNamesValue.trimEnd();
-            })
-
-            const form = document.getElementById('hidden-form');
-            const iframe = document.getElementById('hidden-iframe');
-
-            isSubmitting = true;
-
-            let startTime = Date.now();
-
-            // ui switch - hide form and show saving spinner
-            document.getElementById('edit-container').style.display = 'none';
-            document.getElementById('status-container').style.display = 'block';
-
-            // polling logic
-            const checkDataUpdated = async () => {
-                const secondsElapsed = (Date.now() - startTime) / 1000;
-
-                if (secondsElapsed > 90) {
-                    console.warn('polling timed out');
-                    window.location.href = 'index.html';
-                    return;
-                }
-
-                try {
-                    const allOrderListsData = await getGoogleSheetData('Order List History');
-                    const currentListIdQuantity = allOrderListsData[allOrderListsData.length - 1]['Item IDs'];
-
-                    if (currentListIdQuantity === formInputItemIds.value) {
-                        showSuccessAndRedirect();
-                    } else {
-                        setTimeout(checkDataUpdated, 5000);
-                    }
-
-                } catch (error) {
-                    console.error('polling error:', error);
-
-                    setTimeout(checkDataUpdated, 5000);
-                }
-            };
-
-            iframe.onload = function () {
-                if (isSubmitting) {
-                    checkDataUpdated();
-                }
-            }
-
-            form.submit();
-        }
-
-        function showSuccessAndRedirect() {
-            const statusIcon = document.getElementById('status-icon');
-            const statusText = document.getElementById('status-text');
-
-            statusIcon.classList.remove('spinner');
-            statusIcon.innerHTML = '✔';
-            statusIcon.classList.add('success-tick');
-            statusText.innerText = 'Change Saved';
-
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 2000);
-        }
-
-        function toggleClearConfirmation(showConfirm) {
-            const initial = document.getElementById('initial-actions');
-            const confirm = document.getElementById('confirm-clear');
-
-            if (showConfirm) {
-                initial.classList.add('hidden');
-                confirm.classList.remove('hidden');
-            } else {
-                initial.classList.remove('hidden');
-                confirm.classList.add('hidden');
-            }
-        }
-
-        function untickAllCheckboxes() {
-            const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-
-            allCheckboxes.forEach(checkbox => {checkbox.checked = false;})
-
-            toggleClearConfirmation(false);
-        }
-    </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KG Order List – Edit Current List</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <h1>Edit Current List</h1>
-    <div>
-        <a href="index.html">Home</a>
-        <a href="mark-delivered-items.html">Mark Delivered Items</a>
-        <a href="edit-current-list.html">Edit Current List</a>
-        <a href="add-new-item.html">Add New Item</a>
-    </div>
-    <div id="current-list-div">
-        <h2>Current List</h2>
-        <div id="edit-container">
-            <div class="action-bar">
-                <div id="initial-actions">
-                    <button class="btn save" onclick="toggleSaveConfirmation(true)">Save Changes</button>
-                    <button class="btn clear" onclick="toggleClearConfirmation(true)">Clear Selection</button>
-                </div>
+  <h1>Edit Current List</h1>
 
-                <div id="confirm-save" class="hidden">
-                    <span>Save Changes?</span>
-                    <button class="btn yes" onclick="submitData()">Yes</button>
-                    <button class="btn no" onclick="toggleSaveConfirmation(false)">No</button>
-                </div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="mark-delivered-items.html">Mark Delivered Items</a>
+    <a href="edit-current-list.html">Edit Current List</a>
+    <a href="add-new-item.html">Add New Item</a>
+  </nav>
 
-                <div id="confirm-clear" class="hidden">
-                    <span>Clear Selection?</span>
-                    <button class="btn yes" onclick="untickAllCheckboxes()">Yes</button>
-                    <button class="btn no" onclick="toggleClearConfirmation(false)">No</button>
-                </div>
-            </div>
-            <div id="current-list-div-body"></div>
-            <div id="current-list-div-summary" class="hidden">
-                <h2>Items</h2>
-                <ul id="current-list-div-summary-body"></ul>
-            </div>
-        </div>
-        <div id="status-container">
-            <div id="status-icon" class="spinner"></div>
-            <p id="status-text">Saving Data</p>
-        </div>
-        <form action="https://docs.google.com/forms/d/1otM5e3lonI_X9W0-f3Zkd1fmXPmhphDIg68gnxKxPpE/formResponse" method="POST" id="hidden-form" target="hidden-iframe">
-            <input type="hidden" name="entry.1523484194" id="item-ids" value="">
-            <input type="hidden" name="entry.170440467" id="item-names" value="">
-        </form>
-        <iframe name="hidden-iframe" id="hidden-iframe" style="display: none;"></iframe>
+  <div id="edit-container">
+    <div class="action-bar">
+      <div id="initial-actions">
+        <button id="btn-save">Save Changes</button>
+        <button id="btn-clear">Clear Selection</button>
+      </div>
+
+      <div id="confirm-save" class="hidden">
+        <span>Save Changes?</span>
+        <button id="btn-save-confirm">Yes</button>
+        <button id="btn-save-cancel">No</button>
+      </div>
+
+      <div id="confirm-clear" class="hidden">
+        <span>Clear Selection?</span>
+        <button id="btn-clear-confirm">Yes</button>
+        <button id="btn-clear-cancel">No</button>
+      </div>
     </div>
+
+    <div id="list-body"></div>
+
+    <div id="summary" class="hidden">
+      <h2>Items</h2>
+      <ul id="summary-body"></ul>
+    </div>
+  </div>
+
+  <div id="status-container">
+    <div id="status-icon" class="spinner"></div>
+    <p id="status-text">Saving Data</p>
+  </div>
+
+  <form
+    id="hidden-form"
+    action="https://docs.google.com/forms/d/1otM5e3lonI_X9W0-f3Zkd1fmXPmhphDIg68gnxKxPpE/formResponse"
+    method="POST"
+    target="hidden-iframe"
+  >
+    <input type="hidden" id="item-ids"   name="entry.1523484194" value="">
+    <input type="hidden" id="item-names" name="entry.170440467"  value="">
+  </form>
+  <iframe name="hidden-iframe" id="hidden-iframe" style="display:none;"></iframe>
+
+  <script type="module" src="js/edit-current-list.js"></script>
 </body>
 </html>
