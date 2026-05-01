@@ -1,298 +1,91 @@
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KG Order List</title>
+    <title>KG Order List – Add New Item</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
-    <style>
-        * {
-            font-family: "Sarabun", sans-serif;
-            font-weight: 400;
-            font-style: normal;
-        }
-
-        div a {
-            display: flex;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 16px;
-        }
-
-        input[type="text"], 
-        input[type="number"], 
-        select {
-            width: 100%;
-            padding: 6px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
-
-        #quantity-selection-questions {
-            display: none;
-            padding-left: 20px;
-            border-left: 3px solid;
-        }
-
-        button {
-            padding: 8px 16px;
-            cursor: pointer;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-
-        #status-container {
-            display: none;
-            text-align: center;
-            margin-top: 50px;
-        }
-
-        #status-text {
-            margin-top: 15px;
-        }
-
-        .spinner {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .success-tick {
-            color: #28a745;
-            font-size: 50px;
-            line-height: 50px;
-            font-weight: bold;
-        }
-    </style>
-    <script>
-        async function getGoogleSheetData(sheetName) {
-            try {
-                const spreadsheetId = '1vcItq-vwIjsCMrcGKa111moXmEU4usUkS_BjQYTlcgk';
-                const url = `https://opensheet.elk.sh/${spreadsheetId}/${sheetName}`;
-
-                const response = await fetch(url);
-                const data = await response.json();
-
-                return data;
-
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-
-        async function fetchCategoryItems(selectedCategoryElement) {
-            const selectedCategory = selectedCategoryElement.value;
-            const insertAfterElement = document.getElementById('insert-after');
-
-            if(!selectedCategory) {
-                insertAfterElement.innerHTML = '<option value="">Select Category First</option>';
-                insertAfterElement.disabled = true;
-                return;
-            }
-
-            insertAfterElement.disabled = true;
-
-            const allItemsData = await getGoogleSheetData('Items');
-
-            const categoryItems = allItemsData.filter(row => row['Category'] === selectedCategory);
-
-            insertAfterElement.innerHTML = '<option value="">Select</option>';
-
-            categoryItems.forEach(row => {
-                const option = document.createElement('option');
-
-                option.value = row['Item Name'];
-                option.textContent = row['Item Name'];
-
-                insertAfterElement.appendChild(option);
-            })
-
-            insertAfterElement.disabled = false;
-
-            updateHiddenInput(selectedCategoryElement);
-        }
-
-        function updateHiddenInput(dropdownElement) {
-            const hiddenInput = document.getElementById(`${dropdownElement.id}-hidden`);
-
-            hiddenInput.value = dropdownElement.value;
-        }
-
-        function addQuantitySelectionQuestions(radioState) {
-            const quantitySelectionQuestions = document.getElementById('quantity-selection-questions');
-            const incrementValue = document.getElementById('increment-value');
-            const unitLabel = document.getElementById('unit-label');
-
-            if (radioState.value === 'Yes') {
-                quantitySelectionQuestions.style.display = 'block';
-                incrementValue.required = true;
-                unitLabel.required = true;
-                
-            } else {
-                quantitySelectionQuestions.style.display = 'none';
-                incrementValue.value = '';
-                incrementValue.required = false;
-                unitLabel.value = '';
-                unitLabel.required = false;
-            }
-        }
-
-        async function submitData() {
-            const form = document.getElementById('hidden-form');
-            const iframe = document.getElementById('hidden-iframe');
-
-            if (form.reportValidity()) {
-                isSubmitting = true;
-
-                let startTime = Date.now();
-
-                // ui switch - hide form and show saving spinner
-                document.getElementById('edit-container').style.display = 'none';
-                document.getElementById('status-container').style.display = 'block';
-
-                const allItemsData = await getGoogleSheetData('Items');
-                const itemsCountUpdated = allItemsData.length + 1;
-
-                // polling logic
-                const checkDataUpdated = async () => {
-                    const secondsElapsed = (Date.now() - startTime) / 1000;
-
-                    if (secondsElapsed > 90) {
-                        console.warn('polling timed out');
-                        window.location.href = 'index.html';
-                        return;
-                    }
-
-                    try {
-                        const allItemsData = await getGoogleSheetData('Items');
-                        const itemsCount = allItemsData.length;
-
-                        if (itemsCount === itemsCountUpdated) {
-                            showSuccessAndRedirect();
-                        } else {
-                            setTimeout(checkDataUpdated, 5000);
-                        }
-
-                    } catch (error) {
-                        console.error('polling error:', error);
-
-                        setTimeout(checkDataUpdated, 5000);
-                    }
-                };
-
-                iframe.onload = function () {
-                    if (isSubmitting) {
-                        checkDataUpdated();
-                    }
-                }
-
-                form.submit();
-            }
-        }
-
-        function showSuccessAndRedirect() {
-            const statusIcon = document.getElementById('status-icon');
-            const statusText = document.getElementById('status-text');
-
-            statusIcon.classList.remove('spinner');
-            statusIcon.innerHTML = '✔';
-            statusIcon.classList.add('success-tick');
-            statusText.innerText = 'Change Saved';
-
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 2000)
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
     <h1>Add New Item</h1>
-    <div>
+
+    <nav>
         <a href="index.html">Home</a>
         <a href="mark-delivered-items.html">Mark Delivered Items</a>
         <a href="edit-current-list.html">Edit Current List</a>
         <a href="add-new-item.html">Add New Item</a>
-    </div>
-    <div class="form-container">
-        <form action="https://docs.google.com/forms/d/11jy4lLinqoCPZ6HFNcIBU6wp_4ujURUeBduhj7DYnws/formResponse" method="POST" id="hidden-form" target="hidden-iframe">
+    </nav>
+
+    <div id="edit-container">
+        <form id="hidden-form"
+            action="https://docs.google.com/forms/d/11jy4lLinqoCPZ6HFNcIBU6wp_4ujURUeBduhj7DYnws/formResponse"
+            method="POST" target="hidden-iframe">
             <h2>Details</h2>
 
-            <div id="edit-container">
-                <div class="form-group">
-                    <label for="item-name">Item Name</label>
-                    <input type="text" name="entry.1472301677" id="item-name" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="category">Category</label>
-                    <select name="category" id="category" onchange="fetchCategoryItems(this)" required>
-                        <option value="">Please Select</option>
-                        <option value="Front">Front</option>
-                        <option value="Vegetables">Vegetables</option>
-                        <option value="Kitchen">Kitchen</option>
-                        <option value="Meat">Meat</option>
-                        <option value="Starters">Starters</option>
-                    </select>
-                    <input type="hidden" name="entry.1897388242" id="category-hidden" value="">
-                </div>
-
-                <div class="form-group">
-                    <p>Enable Quantity Selection?</p>
-                    <label>
-                        <input type="radio" name="entry.387719916" value="No" onchange="addQuantitySelectionQuestions(this)" checked> No
-                    </label>
-                    <label>
-                        <input type="radio" name="entry.387719916" value="Yes" onchange="addQuantitySelectionQuestions(this)"> Yes
-                    </label>
-                </div>
-
-                <div id="quantity-selection-questions">
-                    <div class="form-group">
-                        <label for="increment-value">Increment Value (Step Amount)</label>
-                        <input type="number" name="entry.781358804" id="increment-value" min="1" max="100">
-                    </div>
-                    <div class="form-group">
-                        <label for="unit-label">Unit Label</label>
-                        <input type="text" name="entry.1843089101" id="unit-label">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="insert-after">Insert After</label>
-                    <select name="insert-after" id="insert-after" onchange="updateHiddenInput(this)" required>
-                        <option value="">Select Category First</option>
-                    </select>
-                    <input type="hidden" name="entry.358237544" id="insert-after-hidden" value="">
-                </div>
-
-                <button type="submit" onclick="submitData()">Add</button>
+            <div class="form-group">
+                <label for="item-name">Item Name</label>
+                <input type="text" id="item-name" name="entry.1472301677" required>
             </div>
-            
-            <div id="status-container">
-                <div id="status-icon" class="spinner"></div>
-                <p id="status-text">Saving Data</p>
+
+            <div class="form-group">
+                <label for="category">Category</label>
+                <select id="category" required>
+                    <option value="">Please Select</option>
+                    <option value="Front">Front</option>
+                    <option value="Vegetables">Vegetables</option>
+                    <option value="Kitchen">Kitchen</option>
+                    <option value="Meat">Meat</option>
+                    <option value="Starters">Starters</option>
+                </select>
+                <input type="hidden" id="category-hidden" name="entry.1897388242" value="">
             </div>
+
+            <div class="form-group">
+                <p>Enable Quantity Selection?</p>
+                <label>
+                    <input type="radio" name="entry.387719916" value="No" checked> No
+                </label>
+                <label>
+                    <input type="radio" name="entry.387719916" value="Yes"> Yes
+                </label>
+            </div>
+
+            <div id="quantity-section">
+                <div class="form-group">
+                    <label for="increment-value">Increment Value (Step Amount)</label>
+                    <input type="number" id="increment-value" name="entry.781358804" min="1" max="100">
+                </div>
+                <div class="form-group">
+                    <label for="unit-label">Unit Label</label>
+                    <input type="text" id="unit-label" name="entry.1843089101">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="insert-after">Insert After</label>
+                <select id="insert-after" required>
+                    <option value="">Select Category First</option>
+                </select>
+                <input type="hidden" id="insert-after-hidden" name="entry.358237544" value="">
+            </div>
+
+            <button type="button" id="add-btn">Add</button>
         </form>
     </div>
-    <iframe name="hidden-iframe" id="hidden-iframe" style="display: none;"></iframe>
+
+    <div id="status-container">
+        <div id="status-icon" class="spinner"></div>
+        <p id="status-text">Saving Data</p>
+    </div>
+
+    <iframe name="hidden-iframe" id="hidden-iframe" style="display:none;"></iframe>
+
+    <script type="module" src="js/add-new-item.js"></script>
 </body>
+
 </html>
