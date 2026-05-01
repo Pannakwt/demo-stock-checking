@@ -38,11 +38,12 @@ export async function fetchLatestOrder() {
     return rows[rows.length - 1];
 }
 
-/** Parses "itemId" or "itemIdxN" entry strings into { id, quantity }. */
+/** Parses "itemId", "itemIdxN", "itemId#O", or "itemIdxN#O" into { id, quantity, optionId }. */
 export function parseOrderEntry(entry) {
-    const [id, rawQty] = entry.split('x');
+    const [core, optionId = null] = entry.split('#');
+    const [id, rawQty] = core.split('x');
     const quantity = rawQty !== undefined ? parseInt(rawQty, 10) : 0;
-    return { id, quantity: isNaN(quantity) ? 0 : quantity };
+    return { id, quantity: isNaN(quantity) ? 0 : quantity, optionId };
 }
 
 /** Serialises back to "itemId" or "itemIdxN" (omits x0 suffix). */

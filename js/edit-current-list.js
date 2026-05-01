@@ -17,9 +17,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function buildItemList() {
-    const [allItems, latestOrder] = await Promise.all([
+    const [allItems, latestOrder, noteOptions] = await Promise.all([
         fetchSheet('Items'),
         fetchLatestOrder(),
+        fetchSheet('Item Notes'),
     ]);
 
     const listBody = document.getElementById('list-body');
@@ -34,13 +35,13 @@ async function buildItemList() {
         const unit = item['Unit Label'] ?? '';
 
         const categoryBody = getOrCreateCategory(category, listBody);
-        categoryBody.appendChild(buildItemRow(id, name, increment, unit));
+        categoryBody.appendChild(buildItemRow(id, name, increment, unit, noteOptions));
     }
 
     const currentEntries = latestOrder['Item IDs'].split('\n');
 
     for (const raw of currentEntries) {
-        const { id, quantity } = parseOrderEntry(raw);
+        const { id, quantity, optionId } = parseOrderEntry(raw);
         const checkbox = document.getElementById(`cb-${id}`);
         if (!checkbox) continue;
 
@@ -49,6 +50,12 @@ async function buildItemList() {
 
         if (quantity > 0) {
             setQuantity(id, quantity);
+        }
+
+        const noteSelect = document.getElementById(`note-${id}`);
+        if (noteSelect) {
+            noteSelect.classList.remove('hidden');
+            if (optionId) noteSelect.value = optionId;
         }
     }
 }
@@ -79,7 +86,7 @@ function getOrCreateCategory(category, container) {
     return body;
 }
 
-function buildItemRow(id, name, increment, unit) {
+function buildItemRow(id, name, increment, unit, noteOptions) {
     const row = document.createElement('div');
     row.className = 'item-row';
 
@@ -120,6 +127,29 @@ function buildItemRow(id, name, increment, unit) {
 
         row.append(decreaseBtn, countSpan, increaseBtn, unitSpan);
     }
+
+    const noteSelect = document.createElement('select');
+    noteSelect.id = `note-${id}`;
+    noteSelect.className = 'note-select hidden';
+
+    const blank = document.createElement('option');
+    blank.value = '';
+    blank.textContent = '— Add Note —';
+    noteSelect.appendChild(blank);
+
+    for (const opt of noteOptions) {
+        const o = document.createElement('option');
+        o.value = opt['Option ID'];
+        o.textContent = opt['Option Name'];
+        noteSelect.appendChild(o);
+    }
+
+    row.appendChild(noteSelect);
+
+    checkbox.addEventListener('change', () => {
+        noteSelect.classList.toggle('hidden', !checkbox.checked);
+        if (!checkbox.checked) noteSelect.value = '';
+    });
 
     return row;
 }
@@ -166,7 +196,10 @@ function collectSelection() {
         const qty = qtyEl ? parseInt(qtyEl.textContent, 10) || 0 : 0;
         const unitEl = document.getElementById(`unit-${id}`);
         const unit = unitEl?.textContent ?? '';
-        entries.push({ id, name, qty, unit });
+        const noteEl = document.getElementById(`note-${id}`);
+        const optionId = noteEl?.value || null;
+        const optionName = optionId ? noteEl.options[noteEl.selectedIndex].textContent : null;
+        entries.push({ id, name, qty, unit, optionId, optionName });
     });
     return entries;
 }
@@ -195,9 +228,11 @@ function buildSummary(selection) {
     const ul = document.getElementById('summary-body');
     ul.textContent = '';
 
-    for (const { id, name, qty, unit } of selection) {
+    for (const { id, name, qty, unit, optionName } of selection) {
         const li = document.createElement('li');
-        li.textContent = qty > 0 ? `${name} ${qty} ${unit}` : name;
+        let text = qty > 0 ? `${name} ${qty} ${unit}` : name;
+        if (optionName) text += ` (${optionName})`;
+        li.textContent = text;
 
         if (!previousListIds.has(id)) {
             const badge = document.createElement('span');
@@ -224,6 +259,10 @@ function clearAll() {
     });
     document.querySelectorAll('[id^="dec-"]').forEach(el => el.classList.add('hidden'));
     document.querySelectorAll('[id^="unit-"]').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('[id^="note-"]').forEach(el => {
+        el.value = '';
+        el.classList.add('hidden');
+    });
 
     toggleClearConfirm(false);
 }
@@ -232,10 +271,16 @@ async function onSubmit() {
     const selection = collectSelection();
 
     const idsValue = selection
-        .map(({ id, qty }) => serializeOrderEntry(id, qty))
+        .map(({ id, qty, optionId }) => {
+            const base = serializeOrderEntry(id, qty);
+            return optionId ? `${base}#${optionId}` : base;
+        })
         .join('\n');
     const namesValue = selection
-        .map(({ name, qty, unit }) => (qty > 0 ? `${name} ${qty} ${unit}` : name))
+        .map(({ name, qty, unit, optionName }) => {
+            const base = qty > 0 ? `${name} ${qty} ${unit}` : name;
+            return optionName ? `${base} (${optionName})` : base;
+        })
         .join('\n');
 
     document.getElementById('item-ids').value = idsValue;

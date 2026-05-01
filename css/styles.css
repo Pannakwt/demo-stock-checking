@@ -156,8 +156,19 @@ button {
 
 .item-row {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     margin-bottom: 6px;
+}
+
+.note-select {
+    margin-left: 8px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 0.8rem;
+    background: #fff;
+    max-width: 130px;
 }
 
 .checkbox {

@@ -10,9 +10,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadOrderList() {
-    const [allItems, latestOrder] = await Promise.all([
+    const [allItems, latestOrder, noteOptions] = await Promise.all([
         fetchSheet('Items'),
         fetchLatestOrder(),
+        fetchSheet('Item Notes'),
     ]);
 
     const itemMap = {};
@@ -21,17 +22,19 @@ async function loadOrderList() {
         itemMap[row['ID']] = { name: row['Item Name'], unit: row['Unit Label'] };
     }
 
+    const notesMap = Object.fromEntries(noteOptions.map(o => [o['Option ID'], o['Option Name']]));
     const listBody = document.getElementById('list-body');
     const entries = latestOrder['Item IDs'].split('\n');
 
     for (const raw of entries) {
-        const { id, quantity } = parseOrderEntry(raw);
+        const { id, quantity, optionId } = parseOrderEntry(raw);
         const item = itemMap[id];
         if (!item) continue;
 
-        const label = quantity > 0
+        let label = quantity > 0
             ? `${item.name} ${quantity} ${item.unit}`
             : item.name;
+        if (optionId && notesMap[optionId]) label += ` (${notesMap[optionId]})`;
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';

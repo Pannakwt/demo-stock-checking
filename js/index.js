@@ -6,25 +6,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadCurrentList() {
-    const [allItems, latestOrder] = await Promise.all([
+    const [allItems, latestOrder, noteOptions] = await Promise.all([
         fetchSheet('Items'),
         fetchLatestOrder(),
+        fetchSheet('Item Notes'),
     ]);
 
     const itemMap = buildItemMap(allItems);
+    const notesMap = Object.fromEntries(noteOptions.map(o => [o['Option ID'], o['Option Name']]));
     const entries = latestOrder['Item IDs'].split('\n');
 
     const listEl = document.getElementById('current-list-body');
     const copyLines = [];
 
     for (const raw of entries) {
-        const { id, quantity } = parseOrderEntry(raw);
+        const { id, quantity, optionId } = parseOrderEntry(raw);
         const item = itemMap[id];
         if (!item) continue;
 
-        const text = quantity > 0
+        let text = quantity > 0
             ? `${item.name} ${quantity} ${item.unit}`
             : item.name;
+        if (optionId && notesMap[optionId]) text += ` (${notesMap[optionId]})`;
 
         const li = document.createElement('li');
         li.textContent = text;
