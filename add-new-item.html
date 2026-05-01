@@ -1,91 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KG Order List – Add New Item</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KG Order List – Add New Item</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
-  <h1>Add New Item</h1>
+    <h1>Add New Item</h1>
 
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="mark-delivered-items.html">Mark Delivered Items</a>
-    <a href="edit-current-list.html">Edit Current List</a>
-    <a href="add-new-item.html">Add New Item</a>
-  </nav>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="mark-delivered-items.html">Mark Delivered Items</a>
+        <a href="edit-current-list.html">Edit Current List</a>
+        <a href="add-new-item.html">Add New Item</a>
+    </nav>
 
-  <div id="edit-container">
-    <form
-      id="hidden-form"
-      action="https://docs.google.com/forms/d/11jy4lLinqoCPZ6HFNcIBU6wp_4ujURUeBduhj7DYnws/formResponse"
-      method="POST"
-      target="hidden-iframe"
-    >
-      <h2>Details</h2>
+    <div id="edit-container">
+        <form id="hidden-form"
+            action="https://docs.google.com/forms/d/11jy4lLinqoCPZ6HFNcIBU6wp_4ujURUeBduhj7DYnws/formResponse"
+            method="POST" target="hidden-iframe">
+            <h2>Details</h2>
 
-      <div class="form-group">
-        <label for="item-name">Item Name</label>
-        <input type="text" id="item-name" name="entry.1472301677" required>
-      </div>
+            <div class="form-group">
+                <label for="item-name">Item Name</label>
+                <input type="text" id="item-name" name="entry.1472301677" required>
+            </div>
 
-      <div class="form-group">
-        <label for="category">Category</label>
-        <select id="category" required>
-          <option value="">Please Select</option>
-          <option value="Front">Front</option>
-          <option value="Vegetables">Vegetables</option>
-          <option value="Kitchen">Kitchen</option>
-          <option value="Meat">Meat</option>
-          <option value="Starters">Starters</option>
-        </select>
-        <input type="hidden" id="category-hidden" name="entry.1897388242" value="">
-      </div>
+            <div class="form-group">
+                <label for="category">Category</label>
+                <select id="category" required>
+                    <option value="">Please Select</option>
+                    <option value="Front">Front</option>
+                    <option value="Vegetables">Vegetables</option>
+                    <option value="Kitchen">Kitchen</option>
+                    <option value="Meat">Meat</option>
+                    <option value="Starters">Starters</option>
+                </select>
+                <input type="hidden" id="category-hidden" name="entry.1897388242" value="">
+            </div>
 
-      <div class="form-group">
-        <p>Enable Quantity Selection?</p>
-        <label>
-          <input type="radio" name="entry.387719916" value="No" checked> No
-        </label>
-        <label>
-          <input type="radio" name="entry.387719916" value="Yes"> Yes
-        </label>
-      </div>
+            <div class="form-group">
+                <p>Enable Quantity Selection?</p>
+                <label>
+                    <input type="radio" name="entry.387719916" value="No" checked> No
+                </label>
+                <label>
+                    <input type="radio" name="entry.387719916" value="Yes"> Yes
+                </label>
+            </div>
 
-      <div id="quantity-section">
-        <div class="form-group">
-          <label for="increment-value">Increment Value (Step Amount)</label>
-          <input type="number" id="increment-value" name="entry.781358804" min="1" max="100">
-        </div>
-        <div class="form-group">
-          <label for="unit-label">Unit Label</label>
-          <input type="text" id="unit-label" name="entry.1843089101">
-        </div>
-      </div>
+            <div id="quantity-section">
+                <div class="form-group">
+                    <label for="increment-value">Increment Value (Step Amount)</label>
+                    <input type="number" id="increment-value" name="entry.781358804" min="1" max="100">
+                </div>
+                <div class="form-group">
+                    <label for="unit-label">Unit Label</label>
+                    <input type="text" id="unit-label" name="entry.1843089101">
+                </div>
+            </div>
 
-      <div class="form-group">
-        <label for="insert-after">Insert After</label>
-        <select id="insert-after" required>
-          <option value="">Select Category First</option>
-        </select>
-        <input type="hidden" id="insert-after-hidden" name="entry.358237544" value="">
-      </div>
+            <div class="form-group">
+                <label for="insert-after">Insert After</label>
+                <select id="insert-after" required>
+                    <option value="">Select Category First</option>
+                </select>
+                <input type="hidden" id="insert-after-hidden" name="entry.358237544" value="">
+            </div>
 
-      <button type="button" id="add-btn">Add</button>
-    </form>
-  </div>
+            <button type="button" id="add-btn">Add</button>
+        </form>
+    </div>
 
-  <div id="status-container">
-    <div id="status-icon" class="spinner"></div>
-    <p id="status-text">Saving Data</p>
-  </div>
+    <div id="status-container">
+        <div id="status-icon" class="spinner"></div>
+        <p id="status-text">Saving Data</p>
+    </div>
 
-  <iframe name="hidden-iframe" id="hidden-iframe" style="display:none;"></iframe>
+    <iframe name="hidden-iframe" id="hidden-iframe" style="display:none;"></iframe>
 
-  <script type="module" src="js/add-new-item.js"></script>
+    <script type="module" src="js/add-new-item.js"></script>
 </body>
+
 </html>

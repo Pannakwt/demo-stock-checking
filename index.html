@@ -1,43 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KG Order List</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KG Order List</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
-  <h1>KG Order List</h1>
+    <h1>KG Order List</h1>
 
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="mark-delivered-items.html">Mark Delivered Items</a>
-    <a href="edit-current-list.html">Edit Current List</a>
-    <a href="add-new-item.html">Add New Item</a>
-  </nav>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="mark-delivered-items.html">Mark Delivered Items</a>
+        <a href="edit-current-list.html">Edit Current List</a>
+        <a href="add-new-item.html">Add New Item</a>
+    </nav>
 
-  <h2>Current List</h2>
-  <ul id="current-list-body"></ul>
+    <h2>Current List</h2>
+    <ul id="current-list-body"></ul>
 
-  <input type="hidden" id="copy-text" value="">
+    <input type="hidden" id="copy-text" value="">
 
-  <div class="copy-container">
-    <button id="copy-btn">Copy</button>
-    <span id="copy-indicator" class="copy-indicator">
-      <svg class="tick-icon" viewBox="0 0 24 24" fill="none"
-           stroke="currentColor" stroke-width="3"
-           stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="20 6 9 17 4 12"></polyline>
-      </svg>
-      Copied!
-    </span>
-  </div>
+    <div class="copy-container">
+        <button id="copy-btn">Copy</button>
+        <span id="copy-indicator" class="copy-indicator">
+            <svg class="tick-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Copied!
+        </span>
+    </div>
 
-  <p id="last-updated" style="font-style: italic;"></p>
+    <p id="last-updated" style="font-style: italic;"></p>
 
-  <script type="module" src="js/index.js"></script>
+    <script type="module" src="js/index.js"></script>
 </body>
+
 </html>

@@ -1,68 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KG Order List – Edit Current List</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KG Order List – Edit Current List</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
-  <h1>Edit Current List</h1>
+    <h1>Edit Current List</h1>
 
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="mark-delivered-items.html">Mark Delivered Items</a>
-    <a href="edit-current-list.html">Edit Current List</a>
-    <a href="add-new-item.html">Add New Item</a>
-  </nav>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="mark-delivered-items.html">Mark Delivered Items</a>
+        <a href="edit-current-list.html">Edit Current List</a>
+        <a href="add-new-item.html">Add New Item</a>
+    </nav>
 
-  <div id="edit-container">
-    <div class="action-bar">
-      <div id="initial-actions">
-        <button id="btn-save">Save Changes</button>
-        <button id="btn-clear">Clear Selection</button>
-      </div>
+    <div id="edit-container">
+        <div class="action-bar">
+            <div id="initial-actions">
+                <button id="btn-save">Save Changes</button>
+                <button id="btn-clear">Clear Selection</button>
+            </div>
 
-      <div id="confirm-save" class="hidden">
-        <span>Save Changes?</span>
-        <button id="btn-save-confirm">Yes</button>
-        <button id="btn-save-cancel">No</button>
-      </div>
+            <div id="confirm-save" class="hidden">
+                <span>Save Changes?</span>
+                <button id="btn-save-confirm">Yes</button>
+                <button id="btn-save-cancel">No</button>
+            </div>
 
-      <div id="confirm-clear" class="hidden">
-        <span>Clear Selection?</span>
-        <button id="btn-clear-confirm">Yes</button>
-        <button id="btn-clear-cancel">No</button>
-      </div>
+            <div id="confirm-clear" class="hidden">
+                <span>Clear Selection?</span>
+                <button id="btn-clear-confirm">Yes</button>
+                <button id="btn-clear-cancel">No</button>
+            </div>
+        </div>
+
+        <div id="list-body"></div>
+
+        <div id="summary" class="hidden">
+            <h2>Items</h2>
+            <ul id="summary-body"></ul>
+        </div>
     </div>
 
-    <div id="list-body"></div>
-
-    <div id="summary" class="hidden">
-      <h2>Items</h2>
-      <ul id="summary-body"></ul>
+    <div id="status-container">
+        <div id="status-icon" class="spinner"></div>
+        <p id="status-text">Saving Data</p>
     </div>
-  </div>
 
-  <div id="status-container">
-    <div id="status-icon" class="spinner"></div>
-    <p id="status-text">Saving Data</p>
-  </div>
+    <form id="hidden-form"
+        action="https://docs.google.com/forms/d/1otM5e3lonI_X9W0-f3Zkd1fmXPmhphDIg68gnxKxPpE/formResponse" method="POST"
+        target="hidden-iframe">
+        <input type="hidden" id="item-ids" name="entry.1523484194" value="">
+        <input type="hidden" id="item-names" name="entry.170440467" value="">
+    </form>
+    <iframe name="hidden-iframe" id="hidden-iframe" style="display:none;"></iframe>
 
-  <form
-    id="hidden-form"
-    action="https://docs.google.com/forms/d/1otM5e3lonI_X9W0-f3Zkd1fmXPmhphDIg68gnxKxPpE/formResponse"
-    method="POST"
-    target="hidden-iframe"
-  >
-    <input type="hidden" id="item-ids"   name="entry.1523484194" value="">
-    <input type="hidden" id="item-names" name="entry.170440467"  value="">
-  </form>
-  <iframe name="hidden-iframe" id="hidden-iframe" style="display:none;"></iframe>
-
-  <script type="module" src="js/edit-current-list.js"></script>
+    <script type="module" src="js/edit-current-list.js"></script>
 </body>
+
 </html>

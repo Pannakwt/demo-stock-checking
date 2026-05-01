@@ -8,7 +8,7 @@ A stock/order management web app for a restaurant kitchen. Built with vanilla HT
 
 ## Running the App
 
-Open any `.html` file directly in a browser, or serve with any static file server:
+The JS source uses ES modules (`type="module"`), so files **must be served over HTTP** — opening via `file://` is blocked by the browser's CORS policy.
 
 ```bash
 # Python
@@ -18,7 +18,7 @@ python -m http.server 8000
 npx serve .
 ```
 
-No build, compile, or install step required.
+Then open `http://localhost:8000`. No build or install step required.
 
 ## Architecture
 
@@ -70,6 +70,14 @@ Spreadsheet: 1vcItq-vwIjsCMrcGKa111moXmEU4usUkS_BjQYTlcgk
 Add Item form: 11jy4lLinqoCPZ6HFNcIBU6wp_4ujURUeBduhj7DYnws
 Update Orders form: 1otM5e3lonI_X9W0-f3Zkd1fmXPmhphDIg68gnxKxPpE
 ```
+
+## Code Style
+
+- **Indentation:** 4 spaces across all file types (HTML, CSS, JS). This matches the project's `.editorconfig` — if your editor doesn't pick it up automatically, set tab size to 4 and indent with spaces.
+
+## Target Platform
+
+The app is primarily used on **mobile**. Keep this in mind for all UI work: touch-friendly tap targets, readable font sizes, and single-column layouts.
 
 ## Branches
 
